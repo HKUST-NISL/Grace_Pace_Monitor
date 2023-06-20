@@ -8,6 +8,7 @@ from signal import SIGINT
 import logging
 import sys
 from datetime import datetime
+import time
 
 import dynamic_reconfigure.client
 import sensor_msgs.msg
@@ -33,7 +34,7 @@ def loadConfig(path):
     return config_data
 
 #Created Logger
-def setupLogger(log_level, logger_name, log_file_name):
+def setupLogger(file_log_level, terminal_log_level, logger_name, log_file_name):
     log_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s', 
                                   datefmt='%d/%m/%Y %H:%M:%S')
 
@@ -41,16 +42,15 @@ def setupLogger(log_level, logger_name, log_file_name):
     f.close()
     file_handler = logging.FileHandler(log_file_name)
     file_handler.setFormatter(log_formatter)
-    file_handler.setLevel(log_level)
+    file_handler.setLevel(file_log_level)
 
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(log_formatter)
-    stream_handler.setLevel(log_level)
+    stream_handler.setLevel(terminal_log_level)
 
     logger = logging.getLogger(logger_name)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    logger.setLevel(log_level)
 
     return logger
 
@@ -66,7 +66,8 @@ class PaceMonitor:
         signal(SIGINT, handle_sigint)
 
         self.logger = setupLogger(
-                    logging.NOTSET, 
+                    logging.DEBUG, 
+                    logging.INFO, 
                     self.__class__.__name__,
                     "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%p"))
 
@@ -77,7 +78,7 @@ class PaceMonitor:
 
 
         self.vad_proc = utils.vad_proc.VADProc(
-                                        self.config_data['Main']['pace_monitor_freq'],
+                                        self.config_data['Main']['vad_freq'],
                                         self.config_data['Ros']['vad_topic'],
                                         self.logger)
         self.asr_proc = utils.asr_proc.ASRProc(

@@ -1,5 +1,6 @@
 Main:
   pace_monitor_freq: 20
+  vad_freq: 5
 
 Ros:  
   node_name: "pace_monitor"
