@@ -26,7 +26,7 @@ import std_msgs
 
 class VADProc:
     def __init__(self, freq, vad_topic_name, logger):
-        self.__vad_sub = rospy.Subscriber(vad_topic_name, std_msgs.msg.String, self.__vadMsgCallback, queue_size=10)
+        self.__vad_sub = rospy.Subscriber(vad_topic_name, std_msgs.msg.String, self.__vadMsgCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
         
         self.__vad_freq = freq

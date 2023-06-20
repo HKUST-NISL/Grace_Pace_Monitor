@@ -71,22 +71,41 @@ class PaceStateMachine(StateMachine):
     indefinite = State()#either talking or backchanneling
     talking = State()#talking
 
-    #Transitions
-    #From not-talking
-    silence_persists = not_talking.to(not_talking, on="on_silence_persists")
-    silence_broken = not_talking.to(indefinite, on="on_silence_broken")
-    #From indefinite
-    keep_hearing = indefinite.to(indefinite, on="on_keep_hearing")
-    should_be_talking = indefinite.to(talking, on="on_should_be_talking")
-    should_not_be_talking = indefinite.to(not_talking, on="on_should_not_be_talking")
-    #From talking
-    continues_talking = talking.to(talking, on="on_continues_talking")
-    stopped_talking = talking.to(not_talking, on="on_stopped_talking")
+    #Transitions and Events
+    heard_voice = (
+        not_talking.to(indefinite, on="on_silence_broken")
+        |
+        indefinite.to(indefinite, on="on_keep_hearing", unless="true_talking")
+        |
+        indefinite.to(talking, on="on_should_be_talking", cond="true_talking")
+        |
+        talking.to(talking, on="on_continues_talking")
+    )
+    not_hearing_voice = (
+        not_talking.to(not_talking, on="on_silence_persists")
+        |
+        indefinite.to(not_talking, on="on_should_not_be_talking", cond="true_silence")
+        |
+        indefinite.to(indefinite, on="on_keep_hearing", unless="true_silence")
+        |
+        talking.to(not_talking, on="on_stopped_talking", cond="true_silence")
+        |
+        talking.to(talking, on="on_continues_talking", unless="true_silence")
+    )
 
-    #Events
-    heard_voice = silence_broken | keep_hearing | should_be_talking | continues_talking
-    not_hearing_voice = silence_persists | should_not_be_talking | stopped_talking
 
+    def __init__(self, min_talking_cnt, min_silence_cnt, logger):
+        #FSM base class
+        super(self.__class__, self).__init__(rtc=True)
+        #Extra parameters
+        self.__min_talking_cnt = min_talking_cnt
+        self.__talking_cnt = 0
+        self.__min_silence_cnt = min_silence_cnt
+        self.__silence_cnt = 0
+        self.__logger = logger.getChild(self.__class__.__name__)
+
+
+        
     #General transition action
     def on_transition(self, event: str, source: State, target: State):
         self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}'")        
@@ -97,12 +116,11 @@ class PaceStateMachine(StateMachine):
         self.__logger.debug("Still not hearing anything.")
         
     def on_silence_broken(self):
-        self.__indefinite_cnt = 0
-        self.__logger.info("Heard human voices, indef cnt set to %d." % ( self.__indefinite_cnt ) )
+        self.__talking_cnt = 0
+        self.__logger.info("Heard human voices." )
 
     def on_keep_hearing(self):
-        self.__indefinite_cnt = self.__indefinite_cnt + 1
-        self.__logger.debug("Keep hearing voices, indef cnt set to %d." % ( self.__indefinite_cnt ) )
+        self.__logger.debug("Keep hearing voices." )
 
     def on_should_be_talking(self):
         self.__logger.info("The guy should be talking.")
@@ -110,26 +128,35 @@ class PaceStateMachine(StateMachine):
     def on_should_not_be_talking(self):
         self.__logger.info("That's just bc / noise.")
 
-    def on_enter_indefinite(self):
-        if( self.__indefinite_cnt == self.__indefinite_max_cnt ):
-            self.__logger.info("Heard enough, should be talking due to indef cnt %d." % ( self.__indefinite_cnt ) )
-            self.should_be_talking()
-
     def on_continues_talking(self):
         self.__logger.debug("The guy is still talking.")
 
     def on_stopped_talking(self):
         self.__logger.info("The guy finished talking.")
 
+    def true_silence(self, event_data):
+        #Make the pace state less sensitive to pauses
+        if(self.__silence_cnt >= self.__min_silence_cnt):
+            return True
+        else:
+            return False
 
-    def __init__(self, indefinite_max_cnt, logger):
-        #FSM base class
-        super(self.__class__, self).__init__(rtc=True)
-        #Extra parameters
-        self.__indefinite_max_cnt = indefinite_max_cnt
-        self.__indefinite_cnt = 0
-        self.__logger = logger.getChild(self.__class__.__name__)
+    def true_talking(self, event_data):
+        #Make the pace state less sensitive to noise
+        if( self.__talking_cnt >= self.__min_talking_cnt ):
+            return True
+        else:
+            return False
 
+    def on_heard_voice(self):
+        self.__silence_cnt = 0
+        self.__talking_cnt = self.__talking_cnt + 1
+        self.__logger.debug("Silence cnt %d, talking cnt %d." % (self.__silence_cnt, self.__talking_cnt) )
+
+    def on_not_hearing_voice(self):
+        self.__silence_cnt = self.__silence_cnt + 1
+        self.__talking_cnt = 0
+        self.__logger.debug("Silence cnt %d, talking cnt %d." % (self.__silence_cnt, self.__talking_cnt) )
 
     def proc_vad_flag(self, vad_flag):
         if(vad_flag):
@@ -167,9 +194,16 @@ class PaceMonitor:
 
         #core pace state machine
         self.__it_freq = self.__config_data['Main']['pace_monitor_freq']
-        self.__indefinite_state_dur = self.__config_data['Main']['indefinite_time']
-        self.__indefinite_state_iteration = self.__it_freq * self.__indefinite_state_dur
-        self.__pace_fsm = PaceStateMachine(self.__indefinite_state_iteration,self.__logger)
+
+        self.__min_talking_dur = self.__config_data['Main']['min_talking_time']
+        self.__min_talking_iteration = self.__it_freq * self.__min_talking_dur
+
+        self.__min_silence_dur = self.__config_data['Main']['min_silence_time']
+        self.__min_silence_iteration = self.__it_freq * self.__min_silence_dur
+        self.__pace_fsm = PaceStateMachine(
+                                self.__min_talking_iteration,
+                                self.__min_silence_iteration,
+                                self.__logger)
 
     def mainLoop(self):
         rate = rospy.Rate(self.__it_freq)
