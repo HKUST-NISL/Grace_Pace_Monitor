@@ -69,7 +69,7 @@ class PaceMonitor:
                     logging.DEBUG, 
                     logging.INFO, 
                     self.__class__.__name__,
-                    "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%p"))
+                    "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%S_%p"))
 
         path = "./config/config.yaml"
         self.config_data = loadConfig(path)
