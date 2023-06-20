@@ -2,6 +2,8 @@ Main:
   pace_monitor_freq: 20
   vad_freq: 5
 
+  indefinite_time: 0.4
+
 Ros:  
   node_name: "pace_monitor"
   vad_topic:  "/hr/perception/vad"
