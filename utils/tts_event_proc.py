@@ -22,13 +22,14 @@ import hr_msgs.srv
 import std_msgs
 
 
-
-class ASRProc:
-
-    def __init__(self, asr_interim_topic, logger):
+class TTSEventProc:
+    def __init__(self, tts_event_topic_name, logger):
+        self.__tts_event_sub = rospy.Subscriber(tts_event_topic_name, std_msgs.msg.String, self.__ttsEventCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
+        self.tts_playing = False
 
-
+    def __ttsEventCallback(self,msg):
+        pass
 
 
 
