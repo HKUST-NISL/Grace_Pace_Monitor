@@ -46,13 +46,15 @@ class RobotSpeakingFSM(StateMachine):
         speaking.to(not_speaking, on="on_stopped_speaking")
     )
 
-    def __init__(self, start_speaking_event_name, logger):
+    def __init__(self, config_data, logger):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
+
         #Logging
         self.__logger = logger.getChild(self.__class__.__name__)
-        #Code for start speaking event
-        self.__start_speaking_event_name = start_speaking_event_name
+        
+        #Code name for start speaking event
+        self.__start_speaking_event_name = config_data['Ros']['start_speaking_event_name']
 
 
     '''

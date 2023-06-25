@@ -28,8 +28,10 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 import utils.behav_event_proc
+import utils.instantaneous_action_proc
 import human_speaking_fsm
 import robot_speaking_fsm
+import turn_owner_fsm
 
 #Load configs
 def loadConfig(path):
@@ -94,6 +96,10 @@ class PaceMonitor:
         self.__behav_event_proc = utils.behav_event_proc.BehavEventProc(
                                         self.__config_data['Ros']['behav_event_topic'],
                                         self.__logger)
+        self.__inst_action_proc = utils.instantaneous_action_proc.InstantaneousActionProc(
+                                        self.__config_data['Ros']['instantaneous_action_topic'],
+                                        self.__logger)
+
 
         #core pace state fsm
         self.__pace_it_freq = self.__config_data['Main']['pace_monitor_freq']
@@ -103,7 +109,7 @@ class PaceMonitor:
             Speaking state of the robot
         ''' 
         self.__robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
-                            self.__config_data['Ros']['start_speaking_event_name'],
+                            self.__config_data,
                             self.__logger)
 
 
@@ -112,21 +118,20 @@ class PaceMonitor:
         '''
             Speaking state of the human interlocutor
         '''
-        human_speak_min_voice_dur = self.__config_data['Main']['human_speak_min_voice_time']
-        human_speak_min_voice_it = self.__pace_it_freq * human_speak_min_voice_dur
-
-        human_speak_min_silence_dur = self.__config_data['Main']['human_speak_min_silence_time']
-        human_speak_min_silence_it = self.__pace_it_freq * human_speak_min_silence_dur
-        
         self.__human_speaking_fsm = human_speaking_fsm.HumanSpeakingFSM(
-                                human_speak_min_voice_it,
-                                human_speak_min_silence_it,
+                                self.__pace_it_freq,
+                                self.__config_data,
                                 self.__logger)
 
         '''
             Turn ownership
         '''
-
+        self.__turn_owner_fsm = turn_owner_fsm.TurnOwnerFSM(
+                                    self.__pace_it_freq,
+                                    self.__config_data,
+                                    self.__robot_speaking_fsm,
+                                    self.__human_speaking_fsm,
+                                    self.__logger)
 
 
 
@@ -144,7 +149,7 @@ class PaceMonitor:
             self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
             
             #Update turn ownership
-
+            self.__turn_owner_fsm.procInstActionState(self.__inst_action_proc.current_action)
 
             #Sleep by rate
             rate.sleep()

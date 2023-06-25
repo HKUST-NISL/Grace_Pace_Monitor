@@ -2,8 +2,12 @@ Main:
   
   pace_monitor_freq: 20
   vad_freq: 5
+
   human_speak_min_voice_time: 0.4
   human_speak_min_silence_time: 0.3
+
+  human_turn_max_not_speaking_time: 1.1
+
 
 
 Ros:  
@@ -13,3 +17,7 @@ Ros:
   
   behav_event_topic: "/grace_proj/behav_event"
   start_speaking_event_name: "speaking_start"
+
+  instantaneous_action_topic: "/grace_proj/instantaneous_action"
+  robot_take_turn_action_name: "robot_take_turn"
+  robot_yield_turn_action_name: "robot_yield_turn"

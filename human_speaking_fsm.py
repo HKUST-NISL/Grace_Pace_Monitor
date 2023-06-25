@@ -61,14 +61,20 @@ class HumanSpeakingFSM(StateMachine):
     )
 
 
-    def __init__(self, min_voice_cnt, min_silence_cnt, logger):
+    def __init__(self, main_freq, config_data, logger):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
+
         #Extra parameters
-        self.__min_voice_cnt = min_voice_cnt
+        human_speak_min_voice_dur = config_data['Main']['human_speak_min_voice_time']
+        self.__min_voice_cnt = main_freq * human_speak_min_voice_dur
+
+        human_speak_min_silence_dur = config_data['Main']['human_speak_min_silence_time']
+        self.__min_silence_cnt = main_freq * human_speak_min_silence_dur
+        
         self.__voice_cnt = 0
-        self.__min_silence_cnt = min_silence_cnt
         self.__silence_cnt = 0
+
         self.__logger = logger.getChild(self.__class__.__name__)
 
 
@@ -107,6 +113,14 @@ class HumanSpeakingFSM(StateMachine):
     def on_stopped_speaking(self):
         self.__logger.info("The guy finished speaking.")
 
+
+
+
+    '''
+        Transition guards
+        They are called BEFORE transition (and on-transition actions)
+    '''
+
     def true_silence(self, event_data):
         #Make the pace state less sensitive to pauses
         if(self.__silence_cnt >= self.__min_silence_cnt):
@@ -121,6 +135,13 @@ class HumanSpeakingFSM(StateMachine):
         else:
             return False
 
+
+
+
+    '''
+        Event actions named after to state machine convention
+        They are called BEFORE transition guards
+    '''
     def on_heard_voice(self):
         self.__silence_cnt = 0
         self.__voice_cnt = self.__voice_cnt + 1
@@ -130,8 +151,6 @@ class HumanSpeakingFSM(StateMachine):
         self.__silence_cnt = self.__silence_cnt + 1
         self.__voice_cnt = 0
         self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
-
-
 
 
 
