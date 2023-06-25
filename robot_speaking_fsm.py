@@ -28,29 +28,31 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 
-class RobotTalkingFSM(StateMachine):
+class RobotSpeakingFSM(StateMachine):
 
     #States
-    not_talking = State(initial=True)#not talking
-    talking = State()#talking
+    speaking = State()#speaking
+    not_speaking = State(initial=True)#not speaking
 
     #Events
-    tts_is_playing = (
-        not_talking.to(talking, on="on_silence_broken")
+    is_speaking = (
+        not_speaking.to(speaking, on="on_silence_broken")
         |
-        talking.to(talking, on="on_continues_talking")
+        speaking.to(speaking, on="on_continues_speaking")
     )
-    tts_not_playing = (
-        not_talking.to(not_talking, on="on_silence_persists")
+    is_not_speaking = (
+        not_speaking.to(not_speaking, on="on_silence_persists")
         |
-        talking.to(not_talking, on="on_stopped_talking")
+        speaking.to(not_speaking, on="on_stopped_speaking")
     )
 
-    def __init__(self, logger):
+    def __init__(self, start_speaking_event_name, logger):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
         #Logging
         self.__logger = logger.getChild(self.__class__.__name__)
+        #Code for start speaking event
+        self.__start_speaking_event_name = start_speaking_event_name
 
 
     '''
@@ -64,16 +66,16 @@ class RobotTalkingFSM(StateMachine):
 
     #Specific transition actions
     def on_silence_broken(self):
-        self.__logger.info("TTS starts playing.")
+        self.__logger.info("Robot starts speaking.")
 
     def on_silence_persists(self):
-        self.__logger.debug("Still no tts playing.")
+        self.__logger.debug("Still not speaking.")
 
-    def on_continues_talking(self):
-        self.__logger.debug("Still playing tts.")
+    def on_continues_speaking(self):
+        self.__logger.debug("Still speaking.")
 
-    def on_stopped_talking(self):
-        self.__logger.info("TTS stops playing.")
+    def on_stopped_speaking(self):
+        self.__logger.info("Robot stops speaking.")
 
 
 
@@ -84,10 +86,10 @@ class RobotTalkingFSM(StateMachine):
         Wrapper
     '''
 
-    def procTTSPlayingFlag(self, tts_playing_flag):
-        if(tts_playing_flag):
-            self.tts_is_playing()
+    def procBehavEvent(self, behav_event_flag):
+        if(behav_event_flag == self.__start_speaking_event_name):
+            self.is_speaking()
         else:
-            self.tts_not_playing()
+            self.is_not_speaking()
 
 

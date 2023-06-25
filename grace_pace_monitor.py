@@ -27,9 +27,9 @@ import std_msgs
 from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
-import utils.tts_event_proc
-import human_talking_fsm
-import robot_talking_fsm
+import utils.behav_event_proc
+import human_speaking_fsm
+import robot_speaking_fsm
 
 #Load configs
 def loadConfig(path):
@@ -91,8 +91,8 @@ class PaceMonitor:
         self.__asr_proc = utils.asr_proc.ASRProc(
                                         self.__config_data['Ros']['asr_interim_speech_topic'],
                                         self.__logger)
-        self.__tts_event_proc = utils.tts_event_proc.TTSEventProc(
-                                        self.__config_data['Ros']['tts_event_topic'],
+        self.__behav_event_proc = utils.behav_event_proc.BehavEventProc(
+                                        self.__config_data['Ros']['behav_event_topic'],
                                         self.__logger)
 
         #core pace state fsm
@@ -100,25 +100,27 @@ class PaceMonitor:
 
 
         '''
-            Talking state of the robot
+            Speaking state of the robot
         ''' 
-        self.__robot_talking_fsm = robot_talking_fsm.RobotTalkingFSM(self.__logger)
+        self.__robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
+                            self.__config_data['Ros']['start_speaking_event_name'],
+                            self.__logger)
 
 
 
 
         '''
-            Talking state of the human interlocutor
+            Speaking state of the human interlocutor
         '''
-        self.__human__min_talking_dur = self.__config_data['Main']['human_min_talking_time']
-        self.__human_min_talking_iteration = self.__pace_it_freq * self.__human__min_talking_dur
+        human_speak_min_voice_dur = self.__config_data['Main']['human_speak_min_voice_time']
+        human_speak_min_voice_it = self.__pace_it_freq * human_speak_min_voice_dur
 
-        self.__human_min_silence_dur = self.__config_data['Main']['human_min_silence_time']
-        self.__human_min_silence_iteration = self.__pace_it_freq * self.__human_min_silence_dur
+        human_speak_min_silence_dur = self.__config_data['Main']['human_speak_min_silence_time']
+        human_speak_min_silence_it = self.__pace_it_freq * human_speak_min_silence_dur
         
-        self.__human_talking_fsm = human_talking_fsm.HumanTalkingFSM(
-                                self.__human_min_talking_iteration,
-                                self.__human_min_silence_iteration,
+        self.__human_speaking_fsm = human_speaking_fsm.HumanSpeakingFSM(
+                                human_speak_min_voice_it,
+                                human_speak_min_silence_it,
                                 self.__logger)
 
         '''
@@ -126,15 +128,20 @@ class PaceMonitor:
         '''
 
 
+
+
+
+
+
     def mainLoop(self):
         rate = rospy.Rate(self.__pace_it_freq)
 
         while True:
-            #Update robot talking state
-            self.__robot_talking_fsm.procTTSPlayingFlag(self.__tts_event_proc.tts_playing)
+            #Update robot speaking state
+            self.__robot_speaking_fsm.procBehavEvent(self.__behav_event_proc.behav_playing)
 
-            #Update human talking state
-            self.__human_talking_fsm.procVadFlag(self.__vad_proc.vad_flag)
+            #Update human speaking state
+            self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
             
             #Update turn ownership
 

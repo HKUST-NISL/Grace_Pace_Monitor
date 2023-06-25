@@ -31,42 +31,42 @@ import utils.asr_proc
 
 
 
-class HumanTalkingFSM(StateMachine):
+class HumanSpeakingFSM(StateMachine):
 
     #States
-    not_talking = State(initial=True)#not talking
-    indefinite = State()#either talking or backchanneling
-    talking = State()#talking
+    not_speaking = State(initial=True)#not speaking
+    indefinite = State()#either speaking or backchanneling
+    speaking = State()#speaking
 
     #Transitions and Events
     heard_voice = (
-        not_talking.to(indefinite, on="on_silence_broken")
+        not_speaking.to(indefinite, on="on_silence_broken")
         |
-        indefinite.to(indefinite, on="on_keep_hearing", unless="true_talking")
+        indefinite.to(indefinite, on="on_keep_hearing", unless="true_speaking")
         |
-        indefinite.to(talking, on="on_should_be_talking", cond="true_talking")
+        indefinite.to(speaking, on="on_should_be_speaking", cond="true_speaking")
         |
-        talking.to(talking, on="on_continues_talking")
+        speaking.to(speaking, on="on_continues_speaking")
     )
     not_hearing_voice = (
-        not_talking.to(not_talking, on="on_silence_persists")
+        not_speaking.to(not_speaking, on="on_silence_persists")
         |
-        indefinite.to(not_talking, on="on_should_not_be_talking", cond="true_silence")
+        indefinite.to(not_speaking, on="on_should_not_be_speaking", cond="true_silence")
         |
         indefinite.to(indefinite, on="on_keep_hearing", unless="true_silence")
         |
-        talking.to(not_talking, on="on_stopped_talking", cond="true_silence")
+        speaking.to(not_speaking, on="on_stopped_speaking", cond="true_silence")
         |
-        talking.to(talking, on="on_continues_talking", unless="true_silence")
+        speaking.to(speaking, on="on_continues_speaking", unless="true_silence")
     )
 
 
-    def __init__(self, min_talking_cnt, min_silence_cnt, logger):
+    def __init__(self, min_voice_cnt, min_silence_cnt, logger):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
         #Extra parameters
-        self.__min_talking_cnt = min_talking_cnt
-        self.__talking_cnt = 0
+        self.__min_voice_cnt = min_voice_cnt
+        self.__voice_cnt = 0
         self.__min_silence_cnt = min_silence_cnt
         self.__silence_cnt = 0
         self.__logger = logger.getChild(self.__class__.__name__)
@@ -89,23 +89,23 @@ class HumanTalkingFSM(StateMachine):
         self.__logger.debug("Still not hearing anything.")
         
     def on_silence_broken(self):
-        self.__talking_cnt = 0
+        self.__voice_cnt = 0
         self.__logger.info("Heard human voices." )
 
     def on_keep_hearing(self):
         self.__logger.debug("Keep hearing voices." )
 
-    def on_should_be_talking(self):
-        self.__logger.info("The guy should be talking.")
+    def on_should_be_speaking(self):
+        self.__logger.info("The guy should be speaking.")
 
-    def on_should_not_be_talking(self):
+    def on_should_not_be_speaking(self):
         self.__logger.info("That's just bc / noise.")
 
-    def on_continues_talking(self):
-        self.__logger.debug("The guy is still talking.")
+    def on_continues_speaking(self):
+        self.__logger.debug("The guy is still speaking.")
 
-    def on_stopped_talking(self):
-        self.__logger.info("The guy finished talking.")
+    def on_stopped_speaking(self):
+        self.__logger.info("The guy finished speaking.")
 
     def true_silence(self, event_data):
         #Make the pace state less sensitive to pauses
@@ -114,22 +114,22 @@ class HumanTalkingFSM(StateMachine):
         else:
             return False
 
-    def true_talking(self, event_data):
+    def true_speaking(self, event_data):
         #Make the pace state less sensitive to noise
-        if( self.__talking_cnt >= self.__min_talking_cnt ):
+        if( self.__voice_cnt >= self.__min_voice_cnt ):
             return True
         else:
             return False
 
     def on_heard_voice(self):
         self.__silence_cnt = 0
-        self.__talking_cnt = self.__talking_cnt + 1
-        self.__logger.debug("Silence cnt %d, talking cnt %d." % (self.__silence_cnt, self.__talking_cnt) )
+        self.__voice_cnt = self.__voice_cnt + 1
+        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
 
     def on_not_hearing_voice(self):
         self.__silence_cnt = self.__silence_cnt + 1
-        self.__talking_cnt = 0
-        self.__logger.debug("Silence cnt %d, talking cnt %d." % (self.__silence_cnt, self.__talking_cnt) )
+        self.__voice_cnt = 0
+        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
 
 
 

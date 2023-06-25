@@ -2,12 +2,14 @@ Main:
   
   pace_monitor_freq: 20
   vad_freq: 5
-  human_min_talking_time: 0.4
-  human_min_silence_time: 0.2
+  human_speak_min_voice_time: 0.4
+  human_speak_min_silence_time: 0.3
 
 
 Ros:  
   node_name: "pace_monitor"
   vad_topic:  "/hr/perception/vad"
   asr_interim_speech_topic: "/hr/perception/hear/interim_speech"
-  tts_event_topic: "/hr/control/speech/event"
+  
+  behav_event_topic: "/grace_proj/behav_event"
+  start_speaking_event_name: "speaking_start"
