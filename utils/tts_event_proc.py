@@ -29,7 +29,13 @@ class TTSEventProc:
         self.tts_playing = False
 
     def __ttsEventCallback(self,msg):
-        pass
+        if(msg.data == 'start'):
+            self.tts_playing = True
+        elif(msg.data == 'stop'):
+            self.tts_playing = False
+        else:
+            pass
+        self.__logger.debug("New TTS event: %s, current flag is %s." % (msg.data, self.tts_playing) )
 
 
 

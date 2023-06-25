@@ -39,6 +39,9 @@ class VADProc:
         #Receiving a vad message indicates that there is some human voice in the past 1 / freq second
         self.vad_flag = True
 
+        self.__logger.debug("VAD received, starting thread.")
+
+
         #Increment the flag cnt
         self.__vad_flag_cnt = self.__vad_flag_cnt + 1
         
@@ -46,6 +49,7 @@ class VADProc:
         #which will be shown in the vad flag counter
         reset_thread = threading.Thread(target=self.__reset_vad_thread)
         reset_thread.start()
+
 
     def __reset_vad_thread(self):
         #Keep the old counter
@@ -58,4 +62,4 @@ class VADProc:
         if(self.__vad_flag_cnt == cnt_old):
             #No new flag is received
             self.vad_flag = False
-            # self.__logger.info("Reset VAD flag")
+            self.__logger.debug("Reset VAD flag")

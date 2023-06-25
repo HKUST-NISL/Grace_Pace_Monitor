@@ -28,6 +28,8 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 import utils.tts_event_proc
+import human_talking_fsm
+import robot_talking_fsm
 
 #Load configs
 def loadConfig(path):
@@ -99,8 +101,8 @@ class PaceMonitor:
 
         '''
             Talking state of the robot
-        '''
-
+        ''' 
+        self.__robot_talking_fsm = robot_talking_fsm.RobotTalkingFSM(self.__logger)
 
 
 
@@ -114,7 +116,7 @@ class PaceMonitor:
         self.__human_min_silence_dur = self.__config_data['Main']['human_min_silence_time']
         self.__human_min_silence_iteration = self.__pace_it_freq * self.__human_min_silence_dur
         
-        self.__human_talking_fsm = HumanTalkingFSM(
+        self.__human_talking_fsm = human_talking_fsm.HumanTalkingFSM(
                                 self.__human_min_talking_iteration,
                                 self.__human_min_silence_iteration,
                                 self.__logger)
@@ -129,9 +131,10 @@ class PaceMonitor:
 
         while True:
             #Update robot talking state
+            self.__robot_talking_fsm.procTTSPlayingFlag(self.__tts_event_proc.tts_playing)
 
             #Update human talking state
-            self.__human_talking_fsm.proc_vad_flag(self.__vad_proc.vad_flag)
+            self.__human_talking_fsm.procVadFlag(self.__vad_proc.vad_flag)
             
             #Update turn ownership
 

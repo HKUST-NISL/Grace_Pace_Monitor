@@ -10,4 +10,4 @@ Ros:
   node_name: "pace_monitor"
   vad_topic:  "/hr/perception/vad"
   asr_interim_speech_topic: "/hr/perception/hear/interim_speech"
-
+  tts_event_topic: "/hr/control/speech/event"

@@ -72,6 +72,12 @@ class HumanTalkingFSM(StateMachine):
         self.__logger = logger.getChild(self.__class__.__name__)
 
 
+
+
+
+    '''
+        Transition actions named after to state machine convention
+    '''
         
     #General transition action
     def on_transition(self, event: str, source: State, target: State):
@@ -125,7 +131,15 @@ class HumanTalkingFSM(StateMachine):
         self.__talking_cnt = 0
         self.__logger.debug("Silence cnt %d, talking cnt %d." % (self.__silence_cnt, self.__talking_cnt) )
 
-    def proc_vad_flag(self, vad_flag):
+
+
+
+
+    '''
+        Wrapper
+    '''
+
+    def procVadFlag(self, vad_flag):
         if(vad_flag):
             self.heard_voice()
         else:
