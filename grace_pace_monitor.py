@@ -10,6 +10,8 @@ import logging
 import sys
 from datetime import datetime
 import time
+from inspect import getsourcefile
+from os.path import abspath
 
 #ros
 import dynamic_reconfigure.client
@@ -69,8 +71,10 @@ def handle_sigint(signalnum, frame):
     print('Main interrupted! Exiting.')
     sys.exit()
 
-class PaceMonitor:
 
+
+
+class PaceMonitor:
 
     def __init__(self):
         #miscellaneous
@@ -81,7 +85,7 @@ class PaceMonitor:
                     self.__class__.__name__,
                     "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%S_%p"))
 
-        path = "./config/config.yaml"
+        path = abspath(getsourcefile(lambda:0)) + "./config/config.yaml"
         self.__config_data = loadConfig(path)
 
         #ros, sensors
@@ -133,23 +137,30 @@ class PaceMonitor:
                                     self.__human_speaking_fsm,
                                     self.__logger)
 
+    def getPaceState(self):
+        pace_state = {
+            'robot_speaking': self.__robot_speaking_fsm.current_state.id,
+            'human_speaking': self.__human_speaking_fsm.current_state.id,
+            'turn_ownership': self.__turn_owner_fsm.current_state.id
+        }
+        return pace_state
 
+    def updatePaceState(self):
+        #Update robot speaking state
+        self.__robot_speaking_fsm.procBehavEvent(self.__behav_event_proc.behav_playing)
 
-
-
+        #Update human speaking state
+        self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
+        
+        #Update turn ownership
+        self.__turn_owner_fsm.procInstActionState(self.__inst_action_proc.current_action)
 
     def mainLoop(self):
         rate = rospy.Rate(self.__pace_it_freq)
 
         while True:
-            #Update robot speaking state
-            self.__robot_speaking_fsm.procBehavEvent(self.__behav_event_proc.behav_playing)
-
-            #Update human speaking state
-            self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
-            
-            #Update turn ownership
-            self.__turn_owner_fsm.procInstActionState(self.__inst_action_proc.current_action)
+            #Update pace state
+            self.updatePaceState()
 
             #Sleep by rate
             rate.sleep()

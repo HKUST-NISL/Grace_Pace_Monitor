@@ -94,4 +94,3 @@ class RobotSpeakingFSM(StateMachine):
         else:
             self.is_not_speaking()
 
-
