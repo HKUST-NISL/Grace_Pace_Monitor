@@ -11,13 +11,27 @@ Main:
 
 
 Ros:  
+  queue_size: 100
   node_name: "pace_monitor"
   vad_topic:  "/hr/perception/vad"
   asr_interim_speech_topic: "/hr/perception/hear/interim_speech"
   
-  behav_event_topic: "/grace_proj/behav_event"
-  start_speaking_event_name: "speaking_start"
+  speak_event_topic: "/grace_proj/speak_event"
+  nod_event_topic: "/grace_proj/nod_event"
+  gaze_event_topic: "/grace_proj/gaze_event"
 
   turn_action_topic: "/grace_proj/turn_action"
   robot_take_turn_action_name: "robot_take_turn"
   robot_yield_turn_action_name: "robot_yield_turn"
+
+
+General:
+  #Behav event code
+  start_speaking_event_name: "speaking_start"
+  stop_speaking_event_name: "speaking_stop"
+
+  start_nodding_event_name: "nodding_start"
+  stop_nodding_event_name: "nodding_stop"
+
+  start_following_event_name: "gaze_following"
+  start_aversion_event_name: "gaze_aversion"

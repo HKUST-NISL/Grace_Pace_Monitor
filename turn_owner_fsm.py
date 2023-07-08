@@ -63,7 +63,12 @@ class TurnOwnerFSM(StateMachine):
 
 
 
-    def __init__(self, main_freq, config_data, robot_speaking_fsm, human_speaking_fsm, logger):
+    def __init__(
+        self, 
+        main_freq, 
+        config_data, 
+        human_speaking_fsm, 
+        logger):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
 
@@ -72,7 +77,6 @@ class TurnOwnerFSM(StateMachine):
         self.__robot_take_turn_action_name = config_data['Ros']['robot_take_turn_action_name']
         self.__robot_yield_turn_action_name = config_data['Ros']['robot_yield_turn_action_name']
         #Fsm handles
-        self.__robot_speaking_fsm_handle = robot_speaking_fsm
         self.__human_speaking_fsm_handle = human_speaking_fsm
         #Human not speaking counting
         self.__human_turn_max_not_speaking_cnt = main_freq * config_data['Main']['human_turn_max_not_speaking_time']

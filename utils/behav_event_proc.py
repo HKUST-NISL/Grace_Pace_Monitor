@@ -23,14 +23,45 @@ import std_msgs
 
 
 class BehavEventProc:
-    def __init__(self, behav_event_topic_name, logger):
-        self.__behav_event_sub = rospy.Subscriber(behav_event_topic_name, std_msgs.msg.String, self.__behavEventCallback, queue_size=100)
+    def __init__(self, config_data, logger):
+        self.__config_data = config_data
         self.__logger = logger.getChild(self.__class__.__name__)
-        self.behav_playing = ''
 
-    def __behavEventCallback(self,msg):
-        self.behav_playing = msg.data
-        self.__logger.debug("New behav event: %s." % self.behav_playing )
+        #Speaking event
+        self.__speak_event_sub = rospy.Subscriber(
+                                    self.__config_data['Ros']['speak_event_topic'], 
+                                    std_msgs.msg.String, 
+                                    self.__speakEventCallback, 
+                                    queue_size=self.__config_data['Ros']['queue_size'])
+        self.speaking_event = ''
+
+        #Nodding event
+        self.__nod_event_sub = rospy.Subscriber(      
+                                    self.__config_data['Ros']['nod_event_topic'], 
+                                    std_msgs.msg.String,
+                                    self.__nodEventCallback, 
+                                    queue_size=self.__config_data['Ros']['queue_size'])
+        self.nodding_event = ''
 
 
+        #Gaze event
+        self.__gaze_event_sub = rospy.Subscriber(
+                                    self.__config_data['Ros']['gaze_event_topic'], 
+                                    std_msgs.msg.String, 
+                                    self.__gazeEventCallback, 
+                                    queue_size=self.__config_data['Ros']['queue_size'])
+        self.gaze_event = ''
+
+
+    def __speakEventCallback(self,msg):
+        self.speaking_event = msg.data
+        self.__logger.debug("New speak event: %s." % self.speaking_event )
+
+    def __nodEventCallback(self,msg):
+        self.nodding_event = msg.data
+        self.__logger.debug("New nod event: %s." % self.nodding_event )
+
+    def __gazeEventCallback(self,msg):
+        self.gaze_event = msg.data
+        self.__logger.debug("New gaze event: %s." % self.gaze_event )
 

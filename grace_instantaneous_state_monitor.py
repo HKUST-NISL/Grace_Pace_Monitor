@@ -31,9 +31,10 @@ import utils.vad_proc
 import utils.asr_proc
 import utils.behav_event_proc
 import utils.turn_action_proc
+import robot_behav_fsm
 import human_speaking_fsm
-import robot_speaking_fsm
 import turn_owner_fsm
+
 
 #Load configs
 def loadConfig(path):
@@ -102,7 +103,7 @@ class InstantaneousStateMonitor:
                                         self.__config_data['Ros']['asr_interim_speech_topic'],
                                         self.__logger)
         self.__behav_event_proc = utils.behav_event_proc.BehavEventProc(
-                                        self.__config_data['Ros']['behav_event_topic'],
+                                        self.__config_data,
                                         self.__logger)
         self.__turn_action_proc = utils.turn_action_proc.TurnActionProc(
                                         self.__config_data['Ros']['turn_action_topic'],
@@ -111,15 +112,14 @@ class InstantaneousStateMonitor:
 
         #core pace state fsm
         self.__pace_it_freq = self.__config_data['Main']['pace_monitor_freq']
-
+        
 
         '''
-            Speaking state of the robot
+            Behavioral state of the robot
         ''' 
-        self.__robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
-                            self.__config_data,
-                            self.__logger)
-
+        self.__robot_behav_fsm = robot_behav_fsm.RobotBehavFSM(
+                                self.__config_data,
+                                self.__logger)
 
 
 
@@ -137,16 +137,11 @@ class InstantaneousStateMonitor:
         self.__turn_owner_fsm = turn_owner_fsm.TurnOwnerFSM(
                                     self.__pace_it_freq,
                                     self.__config_data,
-                                    self.__robot_speaking_fsm,
                                     self.__human_speaking_fsm,
                                     self.__logger)
 
     def getState(self):
-        inst_state = {
-            'robot_speaking': {
-                'val': self.__robot_speaking_fsm.current_state.id,
-                'stamp': self.__robot_speaking_fsm.stamp_upon_entering
-                },
+        inst_state = self.__robot_behav_fsm.getState() | {
             'human_speaking': {
                 'val': self.__human_speaking_fsm.current_state.id,
                 'stamp': self.__human_speaking_fsm.stamp_upon_entering
@@ -159,8 +154,8 @@ class InstantaneousStateMonitor:
         return inst_state
 
     def updateState(self):
-        #Update robot speaking state
-        self.__robot_speaking_fsm.procBehavEvent(self.__behav_event_proc.behav_playing)
+        #Update robot behavioral state
+        self.__robot_behav_fsm.procEvent(self.__behav_event_proc)
 
         #Update human speaking state
         self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)

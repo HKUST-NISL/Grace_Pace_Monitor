@@ -28,25 +28,25 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 
-class RobotSpeakingFSM(StateMachine):
+class RobotGazeFSM(StateMachine):
 
     #Time stamp of entering each state
     stamp_upon_entering = time.time()
 
     #States
-    speaking = State()#speaking
-    not_speaking = State(initial=True)#not speaking
+    following = State(initial=True)
+    averting = State()
 
     #Events
-    is_speaking = (
-        not_speaking.to(speaking, on="on_silence_broken")
+    is_following = (
+        following.to(following,on="on_gaze_following")
         |
-        speaking.to(speaking, on="on_continues_speaking")
+        averting.to(following,on="on_gaze_following")
     )
-    is_not_speaking = (
-        not_speaking.to(not_speaking, on="on_silence_persists")
+    is_averting = (
+        averting.to(averting,on="on_gaze_averting")
         |
-        speaking.to(not_speaking, on="on_stopped_speaking")
+        following.to(averting,on="on_gaze_averting")
     )
 
     def __init__(self, config_data, logger):
@@ -71,33 +71,21 @@ class RobotSpeakingFSM(StateMachine):
         self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 
-    #Specific transition actions
-    def on_silence_broken(self):
-        self.__logger.info("Robot starts speaking.")
+    def on_gaze_following(self):
+        self.__logger.info("Robot gaze following.")
 
-    def on_silence_persists(self):
-        self.__logger.debug("Still not speaking.")
-
-    def on_continues_speaking(self):
-        self.__logger.debug("Still speaking.")
-
-    def on_stopped_speaking(self):
-        self.__logger.info("Robot stops speaking.")
-
-
-
-
+    def on_gaze_averting(self):
+        self.__logger.info("Robot gaze averting.")
 
 
     '''
         Wrapper
     '''
-
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_speaking_event_name']):
-            self.is_speaking()
-        elif(event_code == self.__config_data['General']['stop_speaking_event_name']):
-            self.is_not_speaking()
+        if(event_code == self.__config_data['General']['start_following_event_name']):
+            self.is_following()
+        elif(event_code == self.__config_data['General']['start_aversion_event_name']):
+            self.is_averting()
         else:
             #Irrelevant event
             pass

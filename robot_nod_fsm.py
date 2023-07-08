@@ -28,25 +28,25 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 
-class RobotSpeakingFSM(StateMachine):
+class RobotNoddingFSM(StateMachine):
 
     #Time stamp of entering each state
     stamp_upon_entering = time.time()
 
     #States
-    speaking = State()#speaking
-    not_speaking = State(initial=True)#not speaking
+    nodding = State()
+    not_nodding = State(initial=True)
 
     #Events
-    is_speaking = (
-        not_speaking.to(speaking, on="on_silence_broken")
+    is_nodding = (
+        not_nodding.to(nodding, on = 'on_nodding')
         |
-        speaking.to(speaking, on="on_continues_speaking")
+        nodding.to(nodding, on = 'on_nodding')
     )
-    is_not_speaking = (
-        not_speaking.to(not_speaking, on="on_silence_persists")
+    is_not_nodding = (
+        not_nodding.to(not_nodding, on = 'on_not_nodding')
         |
-        speaking.to(not_speaking, on="on_stopped_speaking")
+        nodding.to(not_nodding, on = 'on_not_nodding')
     )
 
     def __init__(self, config_data, logger):
@@ -71,33 +71,20 @@ class RobotSpeakingFSM(StateMachine):
         self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 
-    #Specific transition actions
-    def on_silence_broken(self):
-        self.__logger.info("Robot starts speaking.")
+    def on_nodding(self):
+        self.__logger.info("Robot nodding.")
 
-    def on_silence_persists(self):
-        self.__logger.debug("Still not speaking.")
-
-    def on_continues_speaking(self):
-        self.__logger.debug("Still speaking.")
-
-    def on_stopped_speaking(self):
-        self.__logger.info("Robot stops speaking.")
-
-
-
-
-
+    def on_not_nodding(self):
+        self.__logger.info("Robot not nodding.")
 
     '''
         Wrapper
     '''
-
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_speaking_event_name']):
-            self.is_speaking()
-        elif(event_code == self.__config_data['General']['stop_speaking_event_name']):
-            self.is_not_speaking()
+        if(event_code == self.__config_data['General']['start_nodding_event_name']):
+            self.is_nodding()
+        elif(event_code == self.__config_data['General']['stop_nodding_event_name']):
+            self.is_not_nodding()
         else:
             #Irrelevant event
             pass
