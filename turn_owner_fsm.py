@@ -133,11 +133,11 @@ class TurnOwnerFSM(StateMachine):
 
     def robot_taking_turn(self):
         #We know exactly what the robot is doing
-        return ( self.__current_inst_action == self.__robot_take_turn_action_name )
+        return ( self.__current_turn_action == self.__robot_take_turn_action_name )
 
     def robot_yielding_turn(self):
         #We know exactly what the robot is doing
-        return ( self.__current_inst_action == self.__robot_yield_turn_action_name )
+        return ( self.__current_turn_action == self.__robot_yield_turn_action_name )
 
 
     '''
@@ -161,8 +161,8 @@ class TurnOwnerFSM(StateMachine):
     '''
         Wrapper
     '''
-    def procInstActionState(self, current_inst_action):
-        self.__current_inst_action = current_inst_action
+    def procTurnAction(self, current_turn_action):
+        self.__current_turn_action = current_turn_action
         self.update_turn_ownership()
 
     def __is_human_speaking(self):

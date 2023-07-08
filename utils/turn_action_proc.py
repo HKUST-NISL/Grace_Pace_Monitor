@@ -23,15 +23,15 @@ import std_msgs
 
 
 
-class InstantaneousActionProc:
+class TurnActionProc:
 
-    def __init__(self, instantaneous_action_topic_name, logger):
-        self.__instantaneous_action_sub = rospy.Subscriber(instantaneous_action_topic_name, std_msgs.msg.String, self.__instantaneousActionCallback, queue_size=100)
+    def __init__(self, turn_action_topic_name, logger):
+        self.__turn_action_sub = rospy.Subscriber(turn_action_topic_name, std_msgs.msg.String, self.__turnActionCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
         self.current_action = ''
 
 
-    def __instantaneousActionCallback(self, msg):
+    def __turnActionCallback(self, msg):
         self.current_action = msg.data
-        self.__logger.debug("New instantaneous action: %s." % self.current_action )
+        self.__logger.debug("New turn action: %s." % self.current_action )
 

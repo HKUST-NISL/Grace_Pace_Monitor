@@ -30,7 +30,7 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 import utils.behav_event_proc
-import utils.instantaneous_action_proc
+import utils.turn_action_proc
 import human_speaking_fsm
 import robot_speaking_fsm
 import turn_owner_fsm
@@ -104,8 +104,8 @@ class InstantaneousStateMonitor:
         self.__behav_event_proc = utils.behav_event_proc.BehavEventProc(
                                         self.__config_data['Ros']['behav_event_topic'],
                                         self.__logger)
-        self.__inst_action_proc = utils.instantaneous_action_proc.InstantaneousActionProc(
-                                        self.__config_data['Ros']['instantaneous_action_topic'],
+        self.__turn_action_proc = utils.turn_action_proc.TurnActionProc(
+                                        self.__config_data['Ros']['turn_action_topic'],
                                         self.__logger)
 
 
@@ -166,7 +166,7 @@ class InstantaneousStateMonitor:
         self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
         
         #Update turn ownership
-        self.__turn_owner_fsm.procInstActionState(self.__inst_action_proc.current_action)
+        self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.current_action)
 
     def mainLoop(self):
         rate = rospy.Rate(self.__pace_it_freq)
