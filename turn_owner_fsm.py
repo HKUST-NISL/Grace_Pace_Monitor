@@ -32,6 +32,9 @@ import utils.asr_proc
 
 class TurnOwnerFSM(StateMachine):
 
+    #Time stamp of entering each state
+    stamp_upon_entering = time.time()
+
     #States
     not_owned = State(initial=True)#no one owns the turn initially
     robot_turn = State()#The turn is owned by robot
@@ -87,7 +90,9 @@ class TurnOwnerFSM(StateMachine):
     '''
     #General transition action
     def on_transition(self, event: str, source: State, target: State):
-        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}'")        
+        if(source != target):
+            self.stamp_upon_entering = time.time()
+        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
     
     #Specific transition actions

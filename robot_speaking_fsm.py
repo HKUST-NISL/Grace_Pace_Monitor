@@ -30,6 +30,9 @@ import utils.asr_proc
 
 class RobotSpeakingFSM(StateMachine):
 
+    #Time stamp of entering each state
+    stamp_upon_entering = time.time()
+
     #States
     speaking = State()#speaking
     not_speaking = State(initial=True)#not speaking
@@ -63,7 +66,9 @@ class RobotSpeakingFSM(StateMachine):
 
     #General transition action
     def on_transition(self, event: str, source: State, target: State):
-        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}'")        
+        if(source != target):
+            self.stamp_upon_entering = time.time()
+        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 
     #Specific transition actions

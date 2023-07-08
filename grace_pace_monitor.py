@@ -74,9 +74,9 @@ def handle_sigint(signalnum, frame):
 
 
 
-class PaceMonitor:
+class InstantaneousStateMonitor:
 
-    def __init__(self):
+    def __init__(self, nh_in = None):
         #miscellaneous
         signal(SIGINT, handle_sigint)
         self.__logger = setupLogger(
@@ -89,7 +89,11 @@ class PaceMonitor:
         self.__config_data = loadConfig(path)
 
         #ros, sensors
-        self.__nh = rospy.init_node(self.__config_data['Ros']['node_name'])
+        if(nh_in == None):
+            self.__nh = rospy.init_node(self.__config_data['Ros']['node_name'])
+        else:
+            self.__nh = nh_in
+            
         self.__vad_proc = utils.vad_proc.VADProc(
                                         self.__config_data['Main']['vad_freq'],
                                         self.__config_data['Ros']['vad_topic'],
@@ -137,15 +141,24 @@ class PaceMonitor:
                                     self.__human_speaking_fsm,
                                     self.__logger)
 
-    def getPaceState(self):
-        pace_state = {
-            'robot_speaking': self.__robot_speaking_fsm.current_state.id,
-            'human_speaking': self.__human_speaking_fsm.current_state.id,
-            'turn_ownership': self.__turn_owner_fsm.current_state.id
+    def getState(self):
+        inst_state = {
+            'robot_speaking': {
+                'val': self.__robot_speaking_fsm.current_state.id,
+                'stamp': self.__robot_speaking_fsm.stamp_upon_entering
+                },
+            'human_speaking': {
+                'val': self.__human_speaking_fsm.current_state.id,
+                'stamp': self.__human_speaking_fsm.stamp_upon_entering
+            },
+            'turn_ownership': {
+                'val': self.__turn_owner_fsm.current_state.id,
+                'stamp': self.__turn_owner_fsm.stamp_upon_entering
+            }
         }
-        return pace_state
+        return inst_state
 
-    def updatePaceState(self):
+    def updateState(self):
         #Update robot speaking state
         self.__robot_speaking_fsm.procBehavEvent(self.__behav_event_proc.behav_playing)
 
@@ -160,15 +173,15 @@ class PaceMonitor:
 
         while True:
             #Update pace state
-            self.updatePaceState()
+            self.updateState()
 
             #Sleep by rate
             rate.sleep()
 
 
 if __name__ == '__main__':
-    pace_monitor = PaceMonitor()
-    pace_monitor.mainLoop()
+    inst_state_monitor = InstantaneousStateMonitor()
+    inst_state_monitor.mainLoop()
 
 
 
