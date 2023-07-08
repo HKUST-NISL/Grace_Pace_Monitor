@@ -35,6 +35,7 @@ class HumanSpeakingFSM(StateMachine):
 
     #Time stamp of entering each state
     stamp_upon_entering = time.time()
+    is_transition = False
 
     #States
     not_speaking = State(initial=True)#not speaking
@@ -93,7 +94,9 @@ class HumanSpeakingFSM(StateMachine):
         
         if(source != target):
             self.stamp_upon_entering = time.time()
-
+            self.is_transition = True
+        else:
+            self.is_transition = False
         self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 

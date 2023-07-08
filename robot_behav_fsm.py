@@ -60,14 +60,17 @@ class RobotBehavFSM:
         return {
                 'robot_speaking': {
                     'val': self.__robot_speaking_fsm.current_state.id,
-                    'stamp': self.__robot_speaking_fsm.stamp_upon_entering
+                    'stamp': self.__robot_speaking_fsm.stamp_upon_entering,
+                    'transition': self.__robot_speaking_fsm.is_transition
                     },
                 'robot_nodding': {
                     'val': self.__robot_nodding_fsm.current_state.id,
-                    'stamp': self.__robot_nodding_fsm.stamp_upon_entering
+                    'stamp': self.__robot_nodding_fsm.stamp_upon_entering,
+                    'transition': self.__robot_nodding_fsm.is_transition
                     },
                 'robot_gaze': {
                     'val': self.__robot_gaze_fsm.current_state.id,
-                    'stamp': self.__robot_gaze_fsm.stamp_upon_entering
+                    'stamp': self.__robot_gaze_fsm.stamp_upon_entering,
+                    'transition': self.__robot_gaze_fsm.is_transition
                     }
                 }

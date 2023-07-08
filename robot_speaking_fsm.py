@@ -32,6 +32,7 @@ class RobotSpeakingFSM(StateMachine):
 
     #Time stamp of entering each state
     stamp_upon_entering = time.time()
+    is_transition = False
 
     #States
     speaking = State()#speaking
@@ -68,7 +69,9 @@ class RobotSpeakingFSM(StateMachine):
     def on_transition(self, event: str, source: State, target: State):
         if(source != target):
             self.stamp_upon_entering = time.time()
-        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
+            self.is_transition = True
+        else:
+            self.is_transition = False        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 
     #Specific transition actions

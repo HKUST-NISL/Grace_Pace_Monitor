@@ -144,11 +144,13 @@ class InstantaneousStateMonitor:
         inst_state = self.__robot_behav_fsm.getState() | {
             'human_speaking': {
                 'val': self.__human_speaking_fsm.current_state.id,
-                'stamp': self.__human_speaking_fsm.stamp_upon_entering
+                'stamp': self.__human_speaking_fsm.stamp_upon_entering,
+                'transition': self.__human_speaking_fsm.is_transition
             },
             'turn_ownership': {
                 'val': self.__turn_owner_fsm.current_state.id,
-                'stamp': self.__turn_owner_fsm.stamp_upon_entering
+                'stamp': self.__turn_owner_fsm.stamp_upon_entering,
+                'transition': self.__turn_owner_fsm.is_transition
             }
         }
         return inst_state
