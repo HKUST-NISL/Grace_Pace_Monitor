@@ -71,7 +71,8 @@ class RobotNoddingFSM(StateMachine):
             self.stamp_upon_entering = time.time()
             self.is_transition = True
         else:
-            self.is_transition = False        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
+            self.is_transition = False        
+        self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
 
     def on_nodding(self):
