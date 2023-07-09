@@ -90,6 +90,6 @@ class RobotGazeFSM(StateMachine):
         elif(event_code == self.__config_data['General']['start_aversion_event_name']):
             self.is_averting()
         else:
-            #Irrelevant event
+            #Neutral is not handled
             pass
 
