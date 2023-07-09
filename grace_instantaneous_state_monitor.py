@@ -121,8 +121,6 @@ class InstantaneousStateMonitor:
                                 self.__config_data,
                                 self.__logger)
 
-
-
         '''
             Speaking state of the human interlocutor
         '''
@@ -139,6 +137,8 @@ class InstantaneousStateMonitor:
                                     self.__config_data,
                                     self.__human_speaking_fsm,
                                     self.__logger)
+
+
 
     def getState(self):
         inst_state = self.__robot_behav_fsm.getState() | {

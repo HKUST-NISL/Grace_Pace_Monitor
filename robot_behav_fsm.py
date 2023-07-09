@@ -30,6 +30,7 @@ import utils.behav_event_proc
 import robot_nod_fsm
 import robot_gaze_fsm
 import robot_speaking_fsm
+import robot_humming_fsm
 
 class RobotBehavFSM:
 
@@ -44,6 +45,9 @@ class RobotBehavFSM:
         self.__robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
                             self.__config_data,
                             self.__logger)
+        self.__robot_humming_fsm = robot_humming_fsm.RobotHummingFSM(
+                            self.__config_data,
+                            self.__logger)
         self.__robot_nodding_fsm = robot_nod_fsm.RobotNoddingFSM(
                             self.__config_data,
                             self.__logger)
@@ -51,8 +55,11 @@ class RobotBehavFSM:
                             self.__config_data,
                             self.__logger)
 
+
+
     def procEvent(self, behav_event_proc_handle):
         self.__robot_speaking_fsm.procEvent(behav_event_proc_handle.speaking_event)
+        self.__robot_humming_fsm.procEvent(behav_event_proc_handle.humming_event)
         self.__robot_nodding_fsm.procEvent(behav_event_proc_handle.nodding_event)
         self.__robot_gaze_fsm.procEvent(behav_event_proc_handle.gaze_event)
 
@@ -62,6 +69,11 @@ class RobotBehavFSM:
                     'val': self.__robot_speaking_fsm.current_state.id,
                     'stamp': self.__robot_speaking_fsm.stamp_upon_entering,
                     'transition': self.__robot_speaking_fsm.is_transition
+                    },
+                'robot_humming': {
+                    'val': self.__robot_humming_fsm.current_state.id,
+                    'stamp': self.__robot_humming_fsm.stamp_upon_entering,
+                    'transition': self.__robot_humming_fsm.is_transition
                     },
                 'robot_nodding': {
                     'val': self.__robot_nodding_fsm.current_state.id,

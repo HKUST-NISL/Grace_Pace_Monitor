@@ -35,6 +35,14 @@ class BehavEventProc:
                                     queue_size=self.__config_data['Ros']['queue_size'])
         self.speaking_event = ''
 
+        #Humming event
+        self.__hum_event_sub = rospy.Subscriber(
+                                    self.__config_data['Ros']['hum_event_topic'], 
+                                    std_msgs.msg.String, 
+                                    self.__humEventCallback, 
+                                    queue_size=self.__config_data['Ros']['queue_size']) 
+        self.humming_event = ''
+
         #Nodding event
         self.__nod_event_sub = rospy.Subscriber(      
                                     self.__config_data['Ros']['nod_event_topic'], 
@@ -56,6 +64,10 @@ class BehavEventProc:
     def __speakEventCallback(self,msg):
         self.speaking_event = msg.data
         self.__logger.debug("New speak event: %s." % self.speaking_event )
+
+    def __humEventCallback(self,msg):
+        self.humming_event = msg.data
+        self.__logger.debug("New humming event: %s." % self.humming_event )
 
     def __nodEventCallback(self,msg):
         self.nodding_event = msg.data

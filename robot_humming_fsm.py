@@ -28,26 +28,26 @@ from statemachine import StateMachine, State
 import utils.vad_proc
 import utils.asr_proc
 
-class RobotSpeakingFSM(StateMachine):
+class RobotHummingFSM(StateMachine):
 
     #Time stamp of entering each state
     stamp_upon_entering = time.time()
     is_transition = False
 
     #States
-    speaking = State()#speaking
-    not_speaking = State(initial=True)#not speaking
+    humming = State()#humming
+    not_humming = State(initial=True)#not humming
 
     #Events
-    is_speaking = (
-        not_speaking.to(speaking, on="on_silence_broken")
+    is_humming = (
+        not_humming.to(humming, on="on_silence_broken")
         |
-        speaking.to(speaking, on="on_continues_speaking")
+        humming.to(humming, on="on_continues_humming")
     )
-    is_not_speaking = (
-        not_speaking.to(not_speaking, on="on_silence_persists")
+    is_not_humming = (
+        not_humming.to(not_humming, on="on_silence_persists")
         |
-        speaking.to(not_speaking, on="on_stopped_speaking")
+        humming.to(not_humming, on="on_stopped_humming")
     )
 
     def __init__(self, config_data, logger):
@@ -77,16 +77,16 @@ class RobotSpeakingFSM(StateMachine):
 
     #Specific transition actions
     def on_silence_broken(self):
-        self.__logger.info("Robot starts speaking.")
+        self.__logger.info("Robot starts humming.")
 
     def on_silence_persists(self):
-        self.__logger.debug("Still not speaking.")
+        self.__logger.debug("Still not humming.")
 
     def on_continues_speaking(self):
-        self.__logger.debug("Still speaking.")
+        self.__logger.debug("Still humming.")
 
     def on_stopped_speaking(self):
-        self.__logger.info("Robot stops speaking.")
+        self.__logger.info("Robot stops humming.")
 
 
 
@@ -98,10 +98,10 @@ class RobotSpeakingFSM(StateMachine):
     '''
 
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_speaking_event_name']):
-            self.is_speaking()
-        elif(event_code == self.__config_data['General']['stop_speaking_event_name']):
-            self.is_not_speaking()
+        if(event_code == self.__config_data['General']['start_humming_event_name']):
+            self.is_humming()
+        elif(event_code == self.__config_data['General']['stop_humming_event_name']):
+            self.is_not_humming()
         else:
             #Irrelevant event
             pass
