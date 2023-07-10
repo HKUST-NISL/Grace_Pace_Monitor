@@ -31,8 +31,8 @@ import utils.asr_proc
 class RobotGazeFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     following = State(initial=True)
@@ -49,6 +49,15 @@ class RobotGazeFSM(StateMachine):
         |
         following.to(averting,on="on_gaze_averting")
     )
+
+
+    is_staying = (
+        averting.to(averting,on="on_gaze_averting")
+        |
+        following.to(following,on="on_gaze_following")
+    )
+
+
 
     def __init__(self, config_data, logger):
         #FSM base class
@@ -76,10 +85,10 @@ class RobotGazeFSM(StateMachine):
         return "on_transition"
 
     def on_gaze_following(self):
-        self.__logger.info("Robot gaze following.")
+        self.__logger.debug("Robot gaze following.")
 
     def on_gaze_averting(self):
-        self.__logger.info("Robot gaze averting.")
+        self.__logger.debug("Robot gaze averting.")
 
 
     '''
@@ -90,6 +99,8 @@ class RobotGazeFSM(StateMachine):
             self.is_following()
         elif(event_code == self.__config_data['General']['start_aversion_event_name']):
             self.is_averting()
+        elif(event_code == self.__config_data['General']['empty_event_code']):
+            self.is_staying()
         else:
             #Neutral is not handled
             pass

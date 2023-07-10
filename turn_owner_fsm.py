@@ -33,8 +33,8 @@ import utils.asr_proc
 class TurnOwnerFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     not_owned = State(initial=True)#no one owns the turn initially
@@ -75,8 +75,8 @@ class TurnOwnerFSM(StateMachine):
 
         #Extra parameters
         #Action names
-        self.__robot_take_turn_action_name = config_data['Ros']['robot_take_turn_action_name']
-        self.__robot_yield_turn_action_name = config_data['Ros']['robot_yield_turn_action_name']
+        self.__robot_take_turn_action_name = config_data['General']['robot_take_turn_action_name']
+        self.__robot_yield_turn_action_name = config_data['General']['robot_yield_turn_action_name']
         #Fsm handles
         self.__human_speaking_fsm_handle = human_speaking_fsm
         #Human not speaking counting

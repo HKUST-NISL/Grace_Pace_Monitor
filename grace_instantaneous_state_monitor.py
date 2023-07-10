@@ -27,6 +27,10 @@ import std_msgs
 
 #specific
 from statemachine import StateMachine, State
+
+file_path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0)))
+sys.path.append(file_path)
+
 import utils.vad_proc
 import utils.asr_proc
 import utils.behav_event_proc
@@ -72,9 +76,7 @@ def handle_sigint(signalnum, frame):
     print('Main interrupted! Exiting.')
     sys.exit()
 
-
-
-
+    
 class InstantaneousStateMonitor:
 
     def __init__(self, nh_in = None):
@@ -106,7 +108,7 @@ class InstantaneousStateMonitor:
                                         self.__config_data,
                                         self.__logger)
         self.__turn_action_proc = utils.turn_action_proc.TurnActionProc(
-                                        self.__config_data['Ros']['turn_action_topic'],
+                                        self.__config_data,
                                         self.__logger)
 
 
@@ -141,16 +143,19 @@ class InstantaneousStateMonitor:
 
 
     def getState(self):
-        inst_state = self.__robot_behav_fsm.getState() | {
-            'human_speaking': {
-                'val': self.__human_speaking_fsm.current_state.id,
-                'stamp': self.__human_speaking_fsm.stamp_upon_entering,
-                'transition': self.__human_speaking_fsm.is_transition
-            },
-            'turn_ownership': {
-                'val': self.__turn_owner_fsm.current_state.id,
-                'stamp': self.__turn_owner_fsm.stamp_upon_entering,
-                'transition': self.__turn_owner_fsm.is_transition
+        inst_state = {
+            **self.__robot_behav_fsm.getState() ,
+            **{
+                'human_speaking': {
+                    'val': self.__human_speaking_fsm.current_state.id,
+                    'stamp': self.__human_speaking_fsm.stamp_upon_entering,
+                    'transition': self.__human_speaking_fsm.is_transition
+                },
+                'turn_ownership': {
+                    'val': self.__turn_owner_fsm.current_state.id,
+                    'stamp': self.__turn_owner_fsm.stamp_upon_entering,
+                    'transition': self.__turn_owner_fsm.is_transition
+                }
             }
         }
         return inst_state
@@ -164,6 +169,13 @@ class InstantaneousStateMonitor:
         
         #Update turn ownership
         self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.readLatestAction())
+
+    def initializeState(self):
+        #Force reset the starting time of the initial states
+        self.__robot_behav_fsm.initializeState()
+        self.__human_speaking_fsm.stamp_upon_entering = time.time()
+        self.__turn_owner_fsm.stamp_upon_entering = time.time()
+
 
     def mainLoop(self):
         rate = rospy.Rate(self.__pace_it_freq)

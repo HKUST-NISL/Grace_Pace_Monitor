@@ -31,8 +31,8 @@ import utils.asr_proc
 class RobotHummingFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     humming = State()#humming
@@ -48,6 +48,12 @@ class RobotHummingFSM(StateMachine):
         not_humming.to(not_humming, on="on_silence_persists")
         |
         humming.to(not_humming, on="on_stopped_humming")
+    )
+
+    is_staying = (
+        not_humming.to(not_humming,on="on_silence_persists")
+        |
+        humming.to(humming,on="on_continues_humming")
     )
 
     def __init__(self, config_data, logger):
@@ -102,6 +108,8 @@ class RobotHummingFSM(StateMachine):
             self.is_humming()
         elif(event_code == self.__config_data['General']['stop_humming_event_name']):
             self.is_not_humming()
+        elif(event_code == self.__config_data['General']['empty_event_code']):
+            self.is_staying()
         else:
             #Irrelevant event
             pass

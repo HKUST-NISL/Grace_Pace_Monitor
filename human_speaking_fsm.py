@@ -34,8 +34,8 @@ import utils.asr_proc
 class HumanSpeakingFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     not_speaking = State(initial=True)#not speaking

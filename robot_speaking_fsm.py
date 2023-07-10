@@ -31,8 +31,8 @@ import utils.asr_proc
 class RobotSpeakingFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     speaking = State()#speaking
@@ -49,6 +49,13 @@ class RobotSpeakingFSM(StateMachine):
         |
         speaking.to(not_speaking, on="on_stopped_speaking")
     )
+
+    is_staying = (
+        not_speaking.to(not_speaking, on="on_silence_persists")
+        |
+        speaking.to(speaking, on="on_continues_speaking")
+    )
+    
 
     def __init__(self, config_data, logger):
         #FSM base class
@@ -102,6 +109,8 @@ class RobotSpeakingFSM(StateMachine):
             self.is_speaking()
         elif(event_code == self.__config_data['General']['stop_speaking_event_name']):
             self.is_not_speaking()
+        elif(event_code == self.__config_data['General']['empty_event_code']):
+            self.is_staying()
         else:
             #Irrelevant event
             pass

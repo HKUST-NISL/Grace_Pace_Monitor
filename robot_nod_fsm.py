@@ -31,8 +31,8 @@ import utils.asr_proc
 class RobotNoddingFSM(StateMachine):
 
     #Time stamp of entering each state
-    stamp_upon_entering = time.time()
-    is_transition = False
+    stamp_upon_entering = None
+    is_transition = True
 
     #States
     nodding = State()
@@ -48,6 +48,12 @@ class RobotNoddingFSM(StateMachine):
         not_nodding.to(not_nodding, on = 'on_not_nodding')
         |
         nodding.to(not_nodding, on = 'on_not_nodding')
+    )
+
+    is_staying = (
+        not_nodding.to(not_nodding, on = 'on_not_nodding')
+        |
+        nodding.to(nodding, on = 'on_nodding')
     )
 
     def __init__(self, config_data, logger):
@@ -76,10 +82,10 @@ class RobotNoddingFSM(StateMachine):
         return "on_transition"
 
     def on_nodding(self):
-        self.__logger.info("Robot nodding.")
+        self.__logger.debug("Robot nodding.")
 
     def on_not_nodding(self):
-        self.__logger.info("Robot not nodding.")
+        self.__logger.debug("Robot not nodding.")
 
     '''
         Wrapper
@@ -89,6 +95,8 @@ class RobotNoddingFSM(StateMachine):
             self.is_nodding()
         elif(event_code == self.__config_data['General']['stop_nodding_event_name']):
             self.is_not_nodding()
+        elif(event_code == self.__config_data['General']['empty_event_code']):
+            self.is_staying()
         else:
             #Irrelevant event
             pass
