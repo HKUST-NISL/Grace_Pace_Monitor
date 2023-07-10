@@ -25,7 +25,7 @@ import std_msgs
 
 
 class VADProc:
-    def __init__(self, freq, vad_topic_name, logger):
+    def __init__(self, freq, vad_topic_name, vad_config_name, logger):
         self.__vad_sub = rospy.Subscriber(vad_topic_name, std_msgs.msg.String, self.__vadMsgCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
         
@@ -33,6 +33,11 @@ class VADProc:
         self.__vad_reset_interval = 1 / self.__vad_freq
         self.vad_flag = False
         self.__vad_flag_cnt = 0
+
+        #Enable asr
+        self.__vad_dynamic_config_client = dynamic_reconfigure.client.Client(vad_config_name)
+        self.__vad_dynamic_config_client.update_configuration({"enabled":True, "continuous": True})
+
 
 
     def __vadMsgCallback(self,msg):
