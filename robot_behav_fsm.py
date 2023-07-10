@@ -58,10 +58,10 @@ class RobotBehavFSM:
 
 
     def procEvent(self, behav_event_proc_handle):
-        self.__robot_speaking_fsm.procEvent(behav_event_proc_handle.speaking_event)
-        self.__robot_humming_fsm.procEvent(behav_event_proc_handle.humming_event)
-        self.__robot_nodding_fsm.procEvent(behav_event_proc_handle.nodding_event)
-        self.__robot_gaze_fsm.procEvent(behav_event_proc_handle.gaze_event)
+        self.__robot_speaking_fsm.procEvent(behav_event_proc_handle.readSpeakEvent())
+        self.__robot_humming_fsm.procEvent(behav_event_proc_handle.readHumEvent())
+        self.__robot_nodding_fsm.procEvent(behav_event_proc_handle.readNodEvent())
+        self.__robot_gaze_fsm.procEvent(behav_event_proc_handle.readGazeEvent())
 
     def getState(self):
         return {

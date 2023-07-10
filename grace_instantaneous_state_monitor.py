@@ -98,7 +98,6 @@ class InstantaneousStateMonitor:
         self.__vad_proc = utils.vad_proc.VADProc(
                                         self.__config_data['Main']['vad_freq'],
                                         self.__config_data['Ros']['vad_topic'],
-                                        self.__config_data['Ros']['vad_config'],
                                         self.__logger)
         self.__asr_proc = utils.asr_proc.ASRProc(
                                         self.__config_data['Ros']['asr_interim_speech_topic'],
@@ -164,7 +163,7 @@ class InstantaneousStateMonitor:
         self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
         
         #Update turn ownership
-        self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.current_action)
+        self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.readLatestAction())
 
     def mainLoop(self):
         rate = rospy.Rate(self.__pace_it_freq)

@@ -28,10 +28,14 @@ class TurnActionProc:
     def __init__(self, turn_action_topic_name, logger):
         self.__turn_action_sub = rospy.Subscriber(turn_action_topic_name, std_msgs.msg.String, self.__turnActionCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
-        self.current_action = ''
+        self.__latest_action = ''
 
 
     def __turnActionCallback(self, msg):
-        self.current_action = msg.data
-        self.__logger.debug("New turn action: %s." % self.current_action )
+        self.__latest_action = msg.data
+        self.__logger.debug("New turn action: %s." % self.__latest_action )
 
+    def readLatestAction(self):
+        latest_action = self.__latest_action
+        self.__latest_action = ''
+        return latest_action

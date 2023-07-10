@@ -33,7 +33,7 @@ class BehavEventProc:
                                     std_msgs.msg.String, 
                                     self.__speakEventCallback, 
                                     queue_size=self.__config_data['Ros']['queue_size'])
-        self.speaking_event = ''
+        self.__latest_speak_event = ''
 
         #Humming event
         self.__hum_event_sub = rospy.Subscriber(
@@ -41,7 +41,7 @@ class BehavEventProc:
                                     std_msgs.msg.String, 
                                     self.__humEventCallback, 
                                     queue_size=self.__config_data['Ros']['queue_size']) 
-        self.humming_event = ''
+        self.__latest_hum_event = ''
 
         #Nodding event
         self.__nod_event_sub = rospy.Subscriber(      
@@ -49,7 +49,7 @@ class BehavEventProc:
                                     std_msgs.msg.String,
                                     self.__nodEventCallback, 
                                     queue_size=self.__config_data['Ros']['queue_size'])
-        self.nodding_event = ''
+        self.__latest_nod_event = ''
 
 
         #Gaze event
@@ -58,22 +58,42 @@ class BehavEventProc:
                                     std_msgs.msg.String, 
                                     self.__gazeEventCallback, 
                                     queue_size=self.__config_data['Ros']['queue_size'])
-        self.gaze_event = ''
+        self.__latest_gaze_event = ''
 
 
     def __speakEventCallback(self,msg):
-        self.speaking_event = msg.data
-        self.__logger.debug("New speak event: %s." % self.speaking_event )
+        self.__latest_speak_event = msg.data
+        self.__logger.debug("New speak event: %s." % self.__latest_speak_event )
+
+    def readSpeakEvent(self):
+        latest_speak_event = self.__latest_speak_event
+        self.__latest_speak_event = ''
+        return latest_speak_event
+
 
     def __humEventCallback(self,msg):
-        self.humming_event = msg.data
-        self.__logger.debug("New humming event: %s." % self.humming_event )
+        self.__latest_hum_event = msg.data
+        self.__logger.debug("New humming event: %s." % self.__latest_hum_event )
+
+    def readHumEvent(self):
+        latest_hum_event = self.__latest_hum_event
+        self.__latest_hum_event = ''
+        return latest_hum_event
 
     def __nodEventCallback(self,msg):
-        self.nodding_event = msg.data
-        self.__logger.debug("New nod event: %s." % self.nodding_event )
+        self.__latest_nod_event = msg.data
+        self.__logger.debug("New nod event: %s." % self.__latest_nod_event )
+
+    def readNodEvent(self):
+        latest_nod_event = self.__latest_nod_event
+        self.__latest_nod_event = ''
+        return latest_nod_event
 
     def __gazeEventCallback(self,msg):
-        self.gaze_event = msg.data
-        self.__logger.debug("New gaze event: %s." % self.gaze_event )
+        self.__latest_gaze_event = msg.data
+        self.__logger.debug("New gaze event: %s." % self.__latest_gaze_event )
 
+    def readGazeEvent(self):
+        latest_gaze_event = self.__latest_gaze_event
+        self.__latest_gaze_event = ''
+        return latest_gaze_event
