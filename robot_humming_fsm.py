@@ -82,10 +82,10 @@ class RobotHummingFSM(StateMachine):
     def on_silence_persists(self):
         self.__logger.debug("Still not humming.")
 
-    def on_continues_speaking(self):
+    def on_continues_humming(self):
         self.__logger.debug("Still humming.")
 
-    def on_stopped_speaking(self):
+    def on_stopped_humming(self):
         self.__logger.info("Robot stops humming.")
 
 
