@@ -70,10 +70,10 @@ class HumanSpeakingFSM(StateMachine):
         super(self.__class__, self).__init__(rtc=True)
 
         #Extra parameters
-        human_speak_min_voice_dur = config_data['Main']['human_speak_min_voice_time']
+        human_speak_min_voice_dur = config_data['InstState']['Main']['human_speak_min_voice_time']
         self.__min_voice_cnt = main_freq * human_speak_min_voice_dur
 
-        human_speak_min_silence_dur = config_data['Main']['human_speak_min_silence_time']
+        human_speak_min_silence_dur = config_data['InstState']['Main']['human_speak_min_silence_time']
         self.__min_silence_cnt = main_freq * human_speak_min_silence_dur
         
         self.__voice_cnt = 0

@@ -40,13 +40,7 @@ import human_speaking_fsm
 import turn_owner_fsm
 
 
-#Load configs
-def loadConfig(path):
-    #Load configs
-    with open(path, "r") as config_file:
-        config_data = yaml.load(config_file, Loader=yaml.FullLoader)
-        # print("Config file loaded")
-    return config_data
+
 
 #Create Logger
 def setupLogger(file_log_level, terminal_log_level, logger_name, log_file_name):
@@ -79,7 +73,7 @@ def handle_sigint(signalnum, frame):
     
 class InstantaneousStateMonitor:
 
-    def __init__(self, nh_in = None):
+    def __init__(self, config_data, nh_in = None):
         #miscellaneous
         signal(SIGINT, handle_sigint)
         self.__logger = setupLogger(
@@ -88,21 +82,20 @@ class InstantaneousStateMonitor:
                     self.__class__.__name__,
                     "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%S_%p"))
 
-        path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0))) + "/config/config.yaml"
-        self.__config_data = loadConfig(path)
+        self.__config_data = config_data
 
         #ros, sensors
         if(nh_in == None):
-            self.__nh = rospy.init_node(self.__config_data['Ros']['node_name'])
+            self.__nh = rospy.init_node(self.__config_data['InstState']['Ros']['node_name'])
         else:
             self.__nh = nh_in
             
         self.__vad_proc = utils.vad_proc.VADProc(
-                                        self.__config_data['Main']['vad_freq'],
-                                        self.__config_data['Ros']['vad_topic'],
+                                        self.__config_data['HR']['ASRVAD']['vad_freq'],
+                                        self.__config_data['HR']['ASRVAD']['vad_topic'],
                                         self.__logger)
         self.__asr_proc = utils.asr_proc.ASRProc(
-                                        self.__config_data['Ros']['asr_interim_speech_topic'],
+                                        self.__config_data['HR']['ASRVAD']['asr_interim_speech_topic'],
                                         self.__logger)
         self.__behav_event_proc = utils.behav_event_proc.BehavEventProc(
                                         self.__config_data,
@@ -113,7 +106,7 @@ class InstantaneousStateMonitor:
 
 
         #core pace state fsm
-        self.__pace_it_freq = self.__config_data['Main']['pace_monitor_freq']
+        self.__pace_it_freq = self.__config_data['InstState']['Main']['test_freq']
         
 
         '''
@@ -177,9 +170,9 @@ class InstantaneousStateMonitor:
         self.__turn_owner_fsm.stamp_upon_entering = time.time()
 
 
-    def mainLoop(self):
+    def mainLoop(self):#For debugging
         rate = rospy.Rate(self.__pace_it_freq)
-
+        self.initializeState()
         while True:
             #Update pace state
             self.updateState()
@@ -189,7 +182,13 @@ class InstantaneousStateMonitor:
 
 
 if __name__ == '__main__':
-    inst_state_monitor = InstantaneousStateMonitor()
+
+    file_path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0)))
+    sys.path.append(os.path.join(file_path, '..'))
+    from CommonConfigs.grace_cfg_loader import *
+    grace_config = loadGraceConfigs()
+
+    inst_state_monitor = InstantaneousStateMonitor(grace_config)
     inst_state_monitor.mainLoop()
 
 

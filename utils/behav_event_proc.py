@@ -29,36 +29,36 @@ class BehavEventProc:
 
         #Speaking event
         self.__speak_event_sub = rospy.Subscriber(
-                                    self.__config_data['Ros']['speak_event_topic'], 
+                                    self.__config_data['Custom']['Behavior']['Event']['speak_event_topic'], 
                                     std_msgs.msg.String, 
                                     self.__speakEventCallback, 
-                                    queue_size=self.__config_data['Ros']['queue_size'])
-        self.__latest_speak_event = self.__config_data['General']['empty_event_code']
+                                    queue_size=self.__config_data['Custom']['Ros']['queue_size'])
+        self.__latest_speak_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
 
         #Humming event
         self.__hum_event_sub = rospy.Subscriber(
-                                    self.__config_data['Ros']['hum_event_topic'], 
+                                    self.__config_data['Custom']['Behavior']['Event']['hum_event_topic'], 
                                     std_msgs.msg.String, 
                                     self.__humEventCallback, 
-                                    queue_size=self.__config_data['Ros']['queue_size']) 
-        self.__latest_hum_event = self.__config_data['General']['empty_event_code']
+                                    queue_size=self.__config_data['Custom']['Ros']['queue_size']) 
+        self.__latest_hum_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
 
         #Nodding event
         self.__nod_event_sub = rospy.Subscriber(      
-                                    self.__config_data['Ros']['nod_event_topic'], 
+                                    self.__config_data['Custom']['Behavior']['Event']['nod_event_topic'], 
                                     std_msgs.msg.String,
                                     self.__nodEventCallback, 
-                                    queue_size=self.__config_data['Ros']['queue_size'])
-        self.__latest_nod_event = self.__config_data['General']['empty_event_code']
+                                    queue_size=self.__config_data['Custom']['Ros']['queue_size'])
+        self.__latest_nod_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
 
 
         #Gaze event
         self.__gaze_event_sub = rospy.Subscriber(
-                                    self.__config_data['Ros']['gaze_event_topic'], 
+                                    self.__config_data['Custom']['Behavior']['Event']['gaze_event_topic'], 
                                     std_msgs.msg.String, 
                                     self.__gazeEventCallback, 
-                                    queue_size=self.__config_data['Ros']['queue_size'])
-        self.__latest_gaze_event = self.__config_data['General']['empty_event_code']
+                                    queue_size=self.__config_data['Custom']['Ros']['queue_size'])
+        self.__latest_gaze_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
 
 
     def __speakEventCallback(self,msg):
@@ -67,7 +67,7 @@ class BehavEventProc:
 
     def readSpeakEvent(self):
         latest_speak_event = self.__latest_speak_event
-        self.__latest_speak_event = self.__config_data['General']['empty_event_code']
+        self.__latest_speak_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
         return latest_speak_event
 
 
@@ -77,7 +77,7 @@ class BehavEventProc:
 
     def readHumEvent(self):
         latest_hum_event = self.__latest_hum_event
-        self.__latest_hum_event = self.__config_data['General']['empty_event_code']
+        self.__latest_hum_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
         return latest_hum_event
 
     def __nodEventCallback(self,msg):
@@ -86,7 +86,7 @@ class BehavEventProc:
 
     def readNodEvent(self):
         latest_nod_event = self.__latest_nod_event
-        self.__latest_nod_event = self.__config_data['General']['empty_event_code']
+        self.__latest_nod_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
         return latest_nod_event
 
     def __gazeEventCallback(self,msg):
@@ -95,5 +95,5 @@ class BehavEventProc:
 
     def readGazeEvent(self):
         latest_gaze_event = self.__latest_gaze_event
-        self.__latest_gaze_event = self.__config_data['General']['empty_event_code']
+        self.__latest_gaze_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
         return latest_gaze_event

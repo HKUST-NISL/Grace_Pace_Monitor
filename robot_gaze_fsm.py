@@ -95,11 +95,11 @@ class RobotGazeFSM(StateMachine):
         Wrapper
     '''
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_following_event_name']):
+        if(event_code == self.__config_data['BehavExec']['BehavEvent']['start_following_event_name']):
             self.is_following()
-        elif(event_code == self.__config_data['General']['start_aversion_event_name']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['start_aversion_event_name']):
             self.is_averting()
-        elif(event_code == self.__config_data['General']['empty_event_code']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['empty_event_code']):
             self.is_staying()
         else:
             #Neutral is not handled

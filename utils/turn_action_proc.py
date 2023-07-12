@@ -28,11 +28,11 @@ class TurnActionProc:
     def __init__(self, config_data, logger):
         self.__config_data = config_data
         self.__turn_action_sub = rospy.Subscriber(
-                                    self.__config_data['Ros']['turn_action_topic'], 
+                                    self.__config_data['Custom']['TM']['turn_action_topic'], 
                                     std_msgs.msg.String, 
                                     self.__turnActionCallback, queue_size=100)
         self.__logger = logger.getChild(self.__class__.__name__)
-        self.__latest_action = self.__config_data['General']['empty_event_code']
+        self.__latest_action = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
 
 
     def __turnActionCallback(self, msg):
@@ -41,5 +41,5 @@ class TurnActionProc:
 
     def readLatestAction(self):
         latest_action = self.__latest_action
-        self.__latest_action = self.__config_data['General']['empty_event_code']
+        self.__latest_action = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
         return latest_action

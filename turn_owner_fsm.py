@@ -75,12 +75,12 @@ class TurnOwnerFSM(StateMachine):
 
         #Extra parameters
         #Action names
-        self.__robot_take_turn_action_name = config_data['General']['robot_take_turn_action_name']
-        self.__robot_yield_turn_action_name = config_data['General']['robot_yield_turn_action_name']
+        self.__robot_take_turn_action_name = config_data['InstState']['TurnAction']['robot_take_turn_action_name']
+        self.__robot_yield_turn_action_name = config_data['InstState']['TurnAction']['robot_yield_turn_action_name']
         #Fsm handles
         self.__human_speaking_fsm_handle = human_speaking_fsm
         #Human not speaking counting
-        self.__human_turn_max_not_speaking_cnt = main_freq * config_data['Main']['human_turn_max_not_speaking_time']
+        self.__human_turn_max_not_speaking_cnt = main_freq * config_data['InstState']['Main']['human_turn_max_not_speaking_time']
         self.__human_turn_not_speaking_cnt = 0
 
 

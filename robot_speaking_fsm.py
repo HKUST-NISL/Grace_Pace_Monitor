@@ -105,11 +105,11 @@ class RobotSpeakingFSM(StateMachine):
     '''
 
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_speaking_event_name']):
+        if(event_code == self.__config_data['BehavExec']['BehavEvent']['start_speaking_event_name']):
             self.is_speaking()
-        elif(event_code == self.__config_data['General']['stop_speaking_event_name']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['stop_speaking_event_name']):
             self.is_not_speaking()
-        elif(event_code == self.__config_data['General']['empty_event_code']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['empty_event_code']):
             self.is_staying()
         else:
             #Irrelevant event

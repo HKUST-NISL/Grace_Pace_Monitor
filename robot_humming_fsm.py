@@ -104,11 +104,11 @@ class RobotHummingFSM(StateMachine):
     '''
 
     def procEvent(self, event_code):
-        if(event_code == self.__config_data['General']['start_humming_event_name']):
+        if(event_code == self.__config_data['BehavExec']['BehavEvent']['start_humming_event_name']):
             self.is_humming()
-        elif(event_code == self.__config_data['General']['stop_humming_event_name']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['stop_humming_event_name']):
             self.is_not_humming()
-        elif(event_code == self.__config_data['General']['empty_event_code']):
+        elif(event_code == self.__config_data['BehavExec']['BehavEvent']['empty_event_code']):
             self.is_staying()
         else:
             #Irrelevant event
