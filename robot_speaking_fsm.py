@@ -68,7 +68,7 @@ class RobotSpeakingFSM(StateMachine):
         self.__config_data = config_data
 
     def initializeState(self):
-        self.current_state = self.not_speakingnot_speaking
+        self.current_state = self.not_speaking
         self.stamp_upon_entering = time.time()
         self.is_transition = True
 
