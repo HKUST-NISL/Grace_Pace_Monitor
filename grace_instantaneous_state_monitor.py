@@ -132,7 +132,8 @@ class InstantaneousStateMonitor:
                 'turn_ownership': {
                     'val': self.__turn_owner_fsm.current_state.id,
                     'stamp': self.__turn_owner_fsm.stamp_upon_entering,
-                    'transition': self.__turn_owner_fsm.is_transition
+                    'transition': self.__turn_owner_fsm.is_transition,
+                    'from': self.__turn_owner_fsm.from_state
                 }
             }
         }

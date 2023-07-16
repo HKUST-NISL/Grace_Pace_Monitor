@@ -35,10 +35,11 @@ class TurnOwnerFSM(StateMachine):
     #Time stamp of entering each state
     stamp_upon_entering = None
     is_transition = True
+    from_state = None
 
     #States
-    not_owned = State(initial=True)#no one owns the turn initially
-    robot_turn = State()#The turn is owned by robot
+    not_owned = State()#no one owns the turn initially
+    robot_turn = State(initial=True)#The turn is owned by robot
     human_turn = State()#The turn is owned by human
 
 
@@ -98,8 +99,10 @@ class TurnOwnerFSM(StateMachine):
         if(source != target):
             self.stamp_upon_entering = time.time()
             self.is_transition = True
+            self.from_state = source.id
         else:
             self.is_transition = False
+            self.from_state = None
 
         self.__logger.debug(f"on '{event}' from '{source.id}' to '{target.id}' @ %f" % (self.stamp_upon_entering) )        
         return "on_transition"
