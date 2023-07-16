@@ -95,7 +95,7 @@ class TurnOwnerFSM(StateMachine):
         self.__human_turn_not_speaking_cnt = 0
         self.current_state = self.robot_turn
         self.stamp_upon_entering = time.time()
-        self.is_transition = True
+        self.is_transition = False
 
     '''
         Transition actions named after to state machine convention
