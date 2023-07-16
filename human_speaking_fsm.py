@@ -76,13 +76,18 @@ class HumanSpeakingFSM(StateMachine):
         human_speak_min_silence_dur = config_data['InstState']['Main']['human_speak_min_silence_time']
         self.__min_silence_cnt = main_freq * human_speak_min_silence_dur
         
-        self.__voice_cnt = 0
-        self.__silence_cnt = 0
-
         self.__logger = logger.getChild(self.__class__.__name__)
 
+        self.initializeState()
 
 
+
+    def initializeState(self):
+        self.__voice_cnt = 0
+        self.__silence_cnt = 0
+        self.current_state = self.not_speaking
+        self.stamp_upon_entering = time.time()
+        self.is_transition = True
 
 
     '''

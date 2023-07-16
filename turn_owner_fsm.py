@@ -82,14 +82,20 @@ class TurnOwnerFSM(StateMachine):
         self.__human_speaking_fsm_handle = human_speaking_fsm
         #Human not speaking counting
         self.__human_turn_max_not_speaking_cnt = main_freq * config_data['InstState']['Main']['human_turn_max_not_speaking_time']
-        self.__human_turn_not_speaking_cnt = 0
 
-
+        #Logging
         self.__logger = logger.getChild(self.__class__.__name__)
 
+        #Initialzation
+        self.initializeState()
 
 
 
+    def initializeState(self):
+        self.__human_turn_not_speaking_cnt = 0
+        self.current_state = self.robot_turn
+        self.stamp_upon_entering = time.time()
+        self.is_transition = True
 
     '''
         Transition actions named after to state machine convention

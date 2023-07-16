@@ -67,6 +67,11 @@ class RobotSpeakingFSM(StateMachine):
         #Configs
         self.__config_data = config_data
 
+    def initializeState(self):
+        self.current_state = self.not_speakingnot_speaking
+        self.stamp_upon_entering = time.time()
+        self.is_transition = True
+
 
     '''
         Transition actions named after to state machine convention

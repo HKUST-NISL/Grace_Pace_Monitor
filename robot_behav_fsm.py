@@ -90,7 +90,8 @@ class RobotBehavFSM:
 
 
     def initializeState(self):
-        self.__robot_speaking_fsm.stamp_upon_entering = time.time()
-        self.__robot_humming_fsm.stamp_upon_entering = time.time()
-        self.__robot_nodding_fsm.stamp_upon_entering = time.time()
-        self.__robot_gaze_fsm.stamp_upon_entering = time.time()
+        self.__robot_speaking_fsm.initializeState()
+        self.__robot_humming_fsm.initializeState()
+        self.__robot_nodding_fsm.initializeState()
+        self.__robot_gaze_fsm.initializeState()
+

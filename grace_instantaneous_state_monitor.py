@@ -152,8 +152,8 @@ class InstantaneousStateMonitor:
     def initializeState(self):
         #Force reset the starting time of the initial states
         self.__robot_behav_fsm.initializeState()
-        self.__human_speaking_fsm.stamp_upon_entering = time.time()
-        self.__turn_owner_fsm.stamp_upon_entering = time.time()
+        self.__human_speaking_fsm.initializeState()
+        self.__turn_owner_fsm.initializeState()
 
 
     def mainLoop(self):#For debugging

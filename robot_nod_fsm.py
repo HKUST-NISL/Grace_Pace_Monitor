@@ -66,6 +66,11 @@ class RobotNoddingFSM(StateMachine):
         #Configs
         self.__config_data = config_data
 
+    def initializeState(self):
+        self.current_state = self.not_nodding
+        self.stamp_upon_entering = time.time()
+        self.is_transition = True
+
 
     '''
         Transition actions named after to state machine convention
