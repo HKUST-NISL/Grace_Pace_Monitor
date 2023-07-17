@@ -76,11 +76,9 @@ class HumanSpeakingFSM(StateMachine):
             ))
 
         #Extra parameters
-        human_speak_min_voice_dur = config_data['InstState']['Main']['human_speak_min_voice_time']
-        self.__min_voice_cnt = main_freq * human_speak_min_voice_dur
+        self.__true_speaking_cnt_threshold = main_freq * config_data['InstState']['Main']['true_speaking_threshold_sec']
 
-        human_speak_min_silence_dur = config_data['InstState']['Main']['human_speak_min_silence_time']
-        self.__min_silence_cnt = main_freq * human_speak_min_silence_dur
+        self.__true_silence_cnt_threshold = main_freq * config_data['InstState']['Main']['true_silence_threshold_sec']
         
         self.__logger = logger.getChild(self.__class__.__name__)
 
@@ -144,14 +142,14 @@ class HumanSpeakingFSM(StateMachine):
 
     def true_silence(self, event_data):
         #Make the pace state less sensitive to pauses
-        if(self.__silence_cnt >= self.__min_silence_cnt):
+        if(self.__silence_cnt >= self.__true_silence_cnt_threshold):
             return True
         else:
             return False
 
     def true_speaking(self, event_data):
         #Make the pace state less sensitive to noise
-        if( self.__voice_cnt >= self.__min_voice_cnt ):
+        if( self.__voice_cnt >= self.__true_speaking_cnt_threshold ):
             return True
         else:
             return False
@@ -166,12 +164,12 @@ class HumanSpeakingFSM(StateMachine):
     def on_heard_voice(self):
         self.__silence_cnt = 0
         self.__voice_cnt = self.__voice_cnt + 1
-        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
+        self.__logger.info("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
 
     def on_not_hearing_voice(self):
         self.__silence_cnt = self.__silence_cnt + 1
         self.__voice_cnt = 0
-        self.__logger.info("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
+        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
 
 
 
