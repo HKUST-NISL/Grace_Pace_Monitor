@@ -9,6 +9,7 @@ import logging
 import sys
 from datetime import datetime
 import time
+import queue
 
 import dynamic_reconfigure.client
 import sensor_msgs.msg
@@ -25,41 +26,24 @@ import std_msgs
 
 
 class VADProc:
-    def __init__(self, freq, vad_topic_name, logger):
-        self.__vad_sub = rospy.Subscriber(vad_topic_name, std_msgs.msg.String, self.__vadMsgCallback, queue_size=100)
+    def __init__(self, config_data, logger):
+        #Miscellaneous
+        self.__config_data = config_data
         self.__logger = logger.getChild(self.__class__.__name__)
         
-        self.__vad_freq = freq
-        self.__vad_reset_interval = 1 / self.__vad_freq
-        self.vad_flag = False
-        self.__vad_flag_cnt = 0
+        #VAD message handling
+        self.__vad_sub = rospy.Subscriber(
+                            self.__config_data['Custom']['Sensors']['topic_silero_vad_name'], 
+                            std_msgs.msg.String, 
+                            self.__vadMsgCallback, 
+                            queue_size=self.__config_data['Custom']['Ros']['queue_size'])
+        self.__speech_flag = False
 
 
     def __vadMsgCallback(self,msg):
-        #Receiving a vad message indicates that there is some human voice in the past 1 / freq second
-        self.vad_flag = True
-
-        self.__logger.debug("VAD received, starting thread.")
+        self.__speech_flag = (msg.data == self.__config_data['Sensors']['SileroVAD']['speech_string'])
+        self.__logger.debug("Speech flag %s." % self.__speech_flag)
 
 
-        #Increment the flag cnt
-        self.__vad_flag_cnt = self.__vad_flag_cnt + 1
-        
-        #Initiate a thread which will reset the flag if no new vad flag is received
-        #which will be shown in the vad flag counter
-        reset_thread = threading.Thread(target=self.__reset_vad_thread)
-        reset_thread.start()
-
-
-    def __reset_vad_thread(self):
-        #Keep the old counter
-        cnt_old = self.__vad_flag_cnt
-
-        #Sleep for the normial interval computed by vad frequency
-        time.sleep(self.__vad_reset_interval)
-
-        #Reset vad flag if no new vad signal
-        if(self.__vad_flag_cnt == cnt_old):
-            #No new flag is received
-            self.vad_flag = False
-            self.__logger.debug("Reset VAD flag")
+    def readSpeechFlag(self):
+        return self.__speech_flag

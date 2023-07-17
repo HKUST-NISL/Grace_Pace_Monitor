@@ -43,7 +43,7 @@ class HumanSpeakingFSM(StateMachine):
     speaking = State()#speaking
 
     #Transitions and Events
-    heard_voice = (
+    heard_speech = (
         not_speaking.to(indefinite, on="on_silence_broken")
         |
         indefinite.to(indefinite, on="on_keep_hearing", unless="true_speaking")
@@ -52,16 +52,16 @@ class HumanSpeakingFSM(StateMachine):
         |
         speaking.to(speaking, on="on_continues_speaking")
     )
-    not_hearing_voice = (
+    not_heard_speech = (
         not_speaking.to(not_speaking, on="on_silence_persists")
         |
-        indefinite.to(not_speaking, on="on_should_not_be_speaking", cond="true_silence")
+        indefinite.to(not_speaking, on="on_should_not_be_speaking", cond="true_not_speaking")
         |
-        indefinite.to(indefinite, on="on_keep_hearing", unless="true_silence")
+        indefinite.to(indefinite, on="on_keep_hearing", unless="true_not_speaking")
         |
-        speaking.to(not_speaking, on="on_stopped_speaking", cond="true_silence")
+        speaking.to(not_speaking, on="on_stopped_speaking", cond="true_not_speaking")
         |
-        speaking.to(speaking, on="on_continues_speaking", unless="true_silence")
+        speaking.to(speaking, on="on_continues_speaking", unless="true_not_speaking")
     )
 
 
@@ -87,8 +87,8 @@ class HumanSpeakingFSM(StateMachine):
 
 
     def initializeState(self):
-        self.__voice_cnt = 0
-        self.__silence_cnt = 0
+        self.__speech_cnt = 0
+        self.__not_speech_cnt = 0
         self.current_state = self.not_speaking
         self.stamp_upon_entering = time.time()
         self.is_transition = True
@@ -111,20 +111,20 @@ class HumanSpeakingFSM(StateMachine):
 
     #Specific transition actions
     def on_silence_persists(self):
-        self.__logger.debug("Still not hearing anything.")
+        self.__logger.debug("Still not speaking.")
         
     def on_silence_broken(self):
-        self.__voice_cnt = 0
-        self.__logger.info("Heard human voices." )
+        # self.__speech_cnt = 0
+        self.__logger.info("Heard human speaking." )
 
     def on_keep_hearing(self):
-        self.__logger.info("Keep hearing voices." )
+        self.__logger.info("Keep hearing speech." )
 
     def on_should_be_speaking(self):
-        self.__logger.info("The guy should be speaking.")
+        self.__logger.info("The guy should be truly speaking.")
 
     def on_should_not_be_speaking(self):
-        self.__logger.info("That's just bc / noise.")
+        self.__logger.info("That's just bc / noise / silence.")
 
     def on_continues_speaking(self):
         self.__logger.info("The guy is still speaking.")
@@ -140,16 +140,16 @@ class HumanSpeakingFSM(StateMachine):
         They are called BEFORE transition (and on-transition actions)
     '''
 
-    def true_silence(self, event_data):
+    def true_not_speaking(self, event_data):
         #Make the pace state less sensitive to pauses
-        if(self.__silence_cnt >= self.__true_silence_cnt_threshold):
+        if(self.__not_speech_cnt >= self.__true_silence_cnt_threshold):
             return True
         else:
             return False
 
     def true_speaking(self, event_data):
         #Make the pace state less sensitive to noise
-        if( self.__voice_cnt >= self.__true_speaking_cnt_threshold ):
+        if( self.__speech_cnt >= self.__true_speaking_cnt_threshold ):
             return True
         else:
             return False
@@ -161,15 +161,15 @@ class HumanSpeakingFSM(StateMachine):
         Event actions named after to state machine convention
         They are called BEFORE transition guards
     '''
-    def on_heard_voice(self):
-        self.__silence_cnt = 0
-        self.__voice_cnt = self.__voice_cnt + 1
-        self.__logger.info("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
+    def on_heard_speech(self):
+        self.__not_speech_cnt = 0
+        self.__speech_cnt = self.__speech_cnt + 1
+        self.__logger.info("Non-speech cnt %d, speech cnt %d." % (self.__not_speech_cnt, self.__speech_cnt) )
 
-    def on_not_hearing_voice(self):
-        self.__silence_cnt = self.__silence_cnt + 1
-        self.__voice_cnt = 0
-        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
+    def on_not_heard_speech(self):
+        self.__not_speech_cnt = self.__not_speech_cnt + 1
+        self.__speech_cnt = 0
+        self.__logger.debug("Non-speech cnt %d, speech cnt %d." % (self.__not_speech_cnt, self.__speech_cnt) )
 
 
 
@@ -177,13 +177,13 @@ class HumanSpeakingFSM(StateMachine):
         Wrapper
     '''
 
-    def procVadFlag(self, vad_flag):
-        if(vad_flag):
-            #Has vad flag this iteration
-            self.heard_voice()
+    def procVadEvent(self, speech_flag):
+        if(speech_flag):
+            #Has speech flag
+            self.heard_speech()
         else:
-            #No vad flag this iteration
-            self.not_hearing_voice()
+            #No speech flag
+            self.not_heard_speech()
 
 
 

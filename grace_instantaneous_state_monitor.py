@@ -78,8 +78,7 @@ class InstantaneousStateMonitor:
             self.__nh = nh_in
             
         self.__vad_proc = utils.vad_proc.VADProc(
-                                        self.__config_data['HR']['ASRVAD']['vad_freq'],
-                                        self.__config_data['HR']['ASRVAD']['vad_topic'],
+                                        self.__config_data,
                                         self.__logger)
         self.__asr_proc = utils.asr_proc.ASRProc(
                                         self.__config_data['HR']['ASRVAD']['asr_interim_speech_topic'],
@@ -146,7 +145,7 @@ class InstantaneousStateMonitor:
         self.__robot_behav_fsm.procEvent(self.__behav_event_proc)
 
         #Update human speaking state
-        self.__human_speaking_fsm.procVadFlag(self.__vad_proc.vad_flag)
+        self.__human_speaking_fsm.procVadEvent(self.__vad_proc.readSpeechFlag())
         
         #Update turn ownership
         self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.readLatestAction())
