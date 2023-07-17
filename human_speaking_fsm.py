@@ -69,6 +69,12 @@ class HumanSpeakingFSM(StateMachine):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
 
+        #Export state diagram
+        self._graph().write_png( os.path.join(
+            config_data['Custom']['IO']['image_path'],
+            self.__class__.__name__ + '.jpg'
+            ))
+
         #Extra parameters
         human_speak_min_voice_dur = config_data['InstState']['Main']['human_speak_min_voice_time']
         self.__min_voice_cnt = main_freq * human_speak_min_voice_dur
@@ -114,7 +120,7 @@ class HumanSpeakingFSM(StateMachine):
         self.__logger.info("Heard human voices." )
 
     def on_keep_hearing(self):
-        self.__logger.debug("Keep hearing voices." )
+        self.__logger.info("Keep hearing voices." )
 
     def on_should_be_speaking(self):
         self.__logger.info("The guy should be speaking.")
@@ -123,7 +129,7 @@ class HumanSpeakingFSM(StateMachine):
         self.__logger.info("That's just bc / noise.")
 
     def on_continues_speaking(self):
-        self.__logger.debug("The guy is still speaking.")
+        self.__logger.info("The guy is still speaking.")
 
     def on_stopped_speaking(self):
         self.__logger.info("The guy finished speaking.")
@@ -165,7 +171,7 @@ class HumanSpeakingFSM(StateMachine):
     def on_not_hearing_voice(self):
         self.__silence_cnt = self.__silence_cnt + 1
         self.__voice_cnt = 0
-        self.__logger.debug("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
+        self.__logger.info("Silence cnt %d, voice cnt %d." % (self.__silence_cnt, self.__voice_cnt) )
 
 
 
@@ -175,8 +181,10 @@ class HumanSpeakingFSM(StateMachine):
 
     def procVadFlag(self, vad_flag):
         if(vad_flag):
+            #Has vad flag this iteration
             self.heard_voice()
         else:
+            #No vad flag this iteration
             self.not_hearing_voice()
 
 

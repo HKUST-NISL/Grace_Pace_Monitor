@@ -74,6 +74,11 @@ class TurnOwnerFSM(StateMachine):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
 
+        #Export state diagram
+        self._graph().write_png( os.path.join(
+            config_data['Custom']['IO']['image_path'],
+            self.__class__.__name__ + '.jpg'
+            ))
         #Extra parameters
         #Action names
         self.__robot_take_turn_action_name = config_data['InstState']['TurnAction']['robot_take_turn_action_name']

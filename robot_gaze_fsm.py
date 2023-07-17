@@ -63,6 +63,11 @@ class RobotGazeFSM(StateMachine):
         #FSM base class
         super(self.__class__, self).__init__(rtc=True)
 
+        #Export state diagram
+        self._graph().write_png( os.path.join(
+            config_data['Custom']['IO']['image_path'],
+            self.__class__.__name__ + '.jpg'
+            ))
         #Logging
         self.__logger = logger.getChild(self.__class__.__name__)
         

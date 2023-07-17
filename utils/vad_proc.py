@@ -58,7 +58,7 @@ class VADProc:
         #Sleep for the normial interval computed by vad frequency
         time.sleep(self.__vad_reset_interval)
 
-        #Reset vad flag if necessary
+        #Reset vad flag if no new vad signal
         if(self.__vad_flag_cnt == cnt_old):
             #No new flag is received
             self.vad_flag = False
