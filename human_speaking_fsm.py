@@ -118,7 +118,7 @@ class HumanSpeakingFSM(StateMachine):
         self.__logger.info("Heard human speaking." )
 
     def on_keep_hearing(self):
-        self.__logger.info("Keep hearing speech." )
+        self.__logger.debug("Keep hearing speech." )
 
     def on_should_be_speaking(self):
         self.__logger.info("The guy should be truly speaking.")
@@ -127,7 +127,7 @@ class HumanSpeakingFSM(StateMachine):
         self.__logger.info("That's just bc / noise / silence.")
 
     def on_continues_speaking(self):
-        self.__logger.info("The guy is still speaking.")
+        self.__logger.debug("The guy is still speaking.")
 
     def on_stopped_speaking(self):
         self.__logger.info("The guy finished speaking.")
@@ -164,7 +164,7 @@ class HumanSpeakingFSM(StateMachine):
     def on_heard_speech(self):
         self.__not_speech_cnt = 0
         self.__speech_cnt = self.__speech_cnt + 1
-        self.__logger.info("Non-speech cnt %d, speech cnt %d." % (self.__not_speech_cnt, self.__speech_cnt) )
+        self.__logger.debug("Non-speech cnt %d, speech cnt %d." % (self.__not_speech_cnt, self.__speech_cnt) )
 
     def on_not_heard_speech(self):
         self.__not_speech_cnt = self.__not_speech_cnt + 1
