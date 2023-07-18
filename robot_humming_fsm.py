@@ -93,7 +93,7 @@ class RobotHummingFSM(StateMachine):
 
     #Specific transition actions
     def on_silence_broken(self):
-        self.__logger.info("Robot starts humming.")
+        self.__logger.debug("Robot starts humming.")
 
     def on_silence_persists(self):
         self.__logger.debug("Still not humming.")
@@ -102,7 +102,7 @@ class RobotHummingFSM(StateMachine):
         self.__logger.debug("Still humming.")
 
     def on_stopped_humming(self):
-        self.__logger.info("Robot stops humming.")
+        self.__logger.debug("Robot stops humming.")
 
 
 

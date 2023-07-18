@@ -65,6 +65,7 @@ class BehavEventProc:
         self.__latest_speak_event = msg.data
         self.__logger.debug("New speak event: %s." % self.__latest_speak_event )
 
+
     def readSpeakEvent(self):
         latest_speak_event = self.__latest_speak_event
         self.__latest_speak_event = self.__config_data['BehavExec']['BehavEvent']['empty_event_code']
