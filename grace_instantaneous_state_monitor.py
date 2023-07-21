@@ -120,6 +120,14 @@ class InstantaneousStateMonitor:
                                     self.__logger)
 
 
+        '''
+            VAD config
+        '''
+        self.__vad_thresh_pub = rospy.Publisher(
+                                    self.__config_data['Custom']['Sensors']['topic_silero_vad_conf_thresh_name'],
+                                    std_msgs.msg.Float32,
+                                    self.__config_data['Custom']['Ros']['queue_size']
+                                    )
 
     def getState(self):
         inst_state = {
@@ -146,7 +154,23 @@ class InstantaneousStateMonitor:
 
         #Update human speaking state
         self.__human_speaking_fsm.procVadEvent(self.__vad_proc.readSpeechFlag())
-        
+
+        #Update vad config 
+        if(self.__human_speaking_fsm.is_transition):
+            if(
+                self.__human_speaking_fsm.current_state.id == human_speaking_fsm.HumanSpeakingFSM.indefinite
+                or
+                self.__human_speaking_fsm.current_state.id == human_speaking_fsm.HumanSpeakingFSM.speaking
+            ):
+                #Make it easier to go into and stay within speaking state
+                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['SileroVAD']['conf_threshold_alt'])
+            elif(self.__human_speaking_fsm.current_state.id == human_speaking_fsm.HumanSpeakingFSM.not_speaking):
+                #Make it hard to trigger initially
+                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['SileroVAD']['conf_threshold'])
+            else:
+                self.__logger.error('Unexpected speaking state.')
+
+
         #Update turn ownership
         self.__turn_owner_fsm.procTurnAction(self.__turn_action_proc.readLatestAction())
 
