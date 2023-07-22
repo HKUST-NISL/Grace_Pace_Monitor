@@ -178,12 +178,14 @@ class HumanSpeakingFSM(StateMachine):
     '''
 
     def procVadEvent(self, speech_flag):
-        if(speech_flag):
+        if(speech_flag == 1):
             #Has speech flag
             self.heard_speech()
-        else:
+        elif(speech_flag == 0):
             #No speech flag
             self.not_heard_speech()
+        else:
+            pass
 
 
 

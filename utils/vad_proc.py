@@ -37,11 +37,11 @@ class VADProc:
                             std_msgs.msg.String, 
                             self.__vadMsgCallback, 
                             queue_size=self.__config_data['Custom']['Ros']['queue_size'])
-        self.__speech_flag = False
+        self.__speech_flag = None
 
 
     def __vadMsgCallback(self,msg):
-        self.__speech_flag = (msg.data == self.__config_data['Sensors']['SileroVAD']['speech_string'])
+        self.__speech_flag = int(msg.data == self.__config_data['Sensors']['SileroVAD']['speech_string'])
         self.__logger.debug("Speech flag %s." % self.__speech_flag)
 
 
