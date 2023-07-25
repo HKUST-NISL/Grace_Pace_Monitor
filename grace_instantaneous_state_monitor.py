@@ -124,7 +124,7 @@ class InstantaneousStateMonitor:
             VAD config
         '''
         self.__vad_thresh_pub = rospy.Publisher(
-                                    self.__config_data['Custom']['Sensors']['topic_silero_vad_conf_thresh_name'],
+                                    self.__config_data['Custom']['Sensors']['topic_vad_conf_thresh'],
                                     std_msgs.msg.Float32,
                                     queue_size=self.__config_data['Custom']['Ros']['queue_size']
                                     )

@@ -33,7 +33,7 @@ class VADProc:
         
         #VAD message handling
         self.__vad_sub = rospy.Subscriber(
-                            self.__config_data['Custom']['Sensors']['topic_silero_vad_name'], 
+                            self.__config_data['Custom']['Sensors']['topic_vad_results'], 
                             std_msgs.msg.String, 
                             self.__vadMsgCallback, 
                             queue_size=self.__config_data['Custom']['Ros']['queue_size'])
