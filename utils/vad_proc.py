@@ -41,7 +41,7 @@ class VADProc:
 
 
     def __vadMsgCallback(self,msg):
-        self.__speech_flag = int(msg.data == self.__config_data['Sensors']['SileroVAD']['speech_string'])
+        self.__speech_flag = int(msg.data == self.__config_data['Sensors']['VAD']['speech_string'])
         self.__logger.debug("Speech flag %s." % self.__speech_flag)
 
 

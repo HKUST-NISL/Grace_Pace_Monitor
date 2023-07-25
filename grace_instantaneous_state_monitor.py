@@ -163,10 +163,10 @@ class InstantaneousStateMonitor:
                 self.__human_speaking_fsm.current_state == human_speaking_fsm.HumanSpeakingFSM.speaking
             ):
                 #Make it easier to go into and stay within speaking state
-                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['SileroVAD']['conf_threshold_alt'])
+                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['VAD']['conf_threshold_alt'])
             elif(self.__human_speaking_fsm.current_state == human_speaking_fsm.HumanSpeakingFSM.not_speaking):
                 #Make it hard to trigger initially
-                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['SileroVAD']['conf_threshold'])
+                self.__vad_thresh_pub.publish(self.__config_data['Sensors']['VAD']['conf_threshold'])
             else:
                 self.__logger.error('Unexpected speaking state.')
 
