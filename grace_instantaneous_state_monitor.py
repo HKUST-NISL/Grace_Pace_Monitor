@@ -37,6 +37,7 @@ import utils.behav_event_proc
 import utils.turn_action_proc
 import robot_behav_fsm
 import human_speaking_fsm
+import robot_speaking_fsm
 import turn_owner_fsm
 
 #Misc
@@ -123,11 +124,21 @@ class InstantaneousStateMonitor:
         '''
             VAD config
         '''
+        self.__vad_model_pub = rospy.Publisher(
+                                    self.__config_data['Custom']['Sensors']['topic_vad_model'],
+                                    std_msgs.msg.String,
+                                    queue_size=self.__config_data['Custom']['Ros']['queue_size']
+                                    )
         self.__vad_thresh_pub = rospy.Publisher(
                                     self.__config_data['Custom']['Sensors']['topic_vad_conf_thresh'],
                                     std_msgs.msg.Float32,
                                     queue_size=self.__config_data['Custom']['Ros']['queue_size']
                                     )
+
+    def initVAD(self):
+        self.__vad_model_pub.publish(std_msgs.msg.String(self.__config_data['Sensors']['PyannoteVAD']['ls_model_code']))
+        self.__vad_thresh_pub.publish(self.__config_data['Sensors']['VAD']['conf_threshold'])
+
 
     def getState(self):
         inst_state = {
@@ -151,6 +162,16 @@ class InstantaneousStateMonitor:
     def updateState(self):
         #Update robot behavioral state
         self.__robot_behav_fsm.procEvent(self.__behav_event_proc)
+
+        #Update vad model (ugly)
+        if( self.__turn_owner_fsm.current_state == turn_owner_fsm.TurnOwnerFSM.robot_turn):
+            #Use less sensitive vad model
+            self.__vad_model_pub.publish(std_msgs.msg.String(self.__config_data['Sensors']['PyannoteVAD']['ls_model_code']))
+        else:
+            #Use more sensitive vad model
+            self.__vad_model_pub.publish(std_msgs.msg.String(self.__config_data['Sensors']['PyannoteVAD']['ms_model_code']))
+
+
 
         #Update human speaking state
         self.__human_speaking_fsm.procVadEvent(self.__vad_proc.readSpeechFlag())
