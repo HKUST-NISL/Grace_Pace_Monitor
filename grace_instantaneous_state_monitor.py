@@ -38,6 +38,7 @@ import utils.turn_action_proc
 import robot_behav_fsm
 import human_speaking_fsm
 import robot_speaking_fsm
+import robot_humming_fsm
 import turn_owner_fsm
 
 #Misc
@@ -164,7 +165,9 @@ class InstantaneousStateMonitor:
         self.__robot_behav_fsm.procEvent(self.__behav_event_proc)
 
         #Update vad model (ugly)
-        if( self.__turn_owner_fsm.current_state == turn_owner_fsm.TurnOwnerFSM.robot_turn):
+        if( self.__robot_behav_fsm._robot_humming_fsm.current_state == robot_humming_fsm.RobotHummingFSM.humming
+           or
+            self.__robot_behav_fsm._robot_speaking_fsm.current_state == robot_speaking_fsm.RobotSpeakingFSM.speaking):
             #Use less sensitive vad model
             self.__vad_model_pub.publish(std_msgs.msg.String(self.__config_data['Sensors']['PyannoteVAD']['ls_model_code']))
         else:

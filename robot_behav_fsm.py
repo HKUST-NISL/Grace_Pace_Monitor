@@ -42,10 +42,10 @@ class RobotBehavFSM:
         self.__config_data = config_data
 
         #Sub-fsm
-        self.__robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
+        self._robot_speaking_fsm = robot_speaking_fsm.RobotSpeakingFSM(
                             self.__config_data,
                             self.__logger)
-        self.__robot_humming_fsm = robot_humming_fsm.RobotHummingFSM(
+        self._robot_humming_fsm = robot_humming_fsm.RobotHummingFSM(
                             self.__config_data,
                             self.__logger)
         self.__robot_nodding_fsm = robot_nod_fsm.RobotNoddingFSM(
@@ -58,22 +58,22 @@ class RobotBehavFSM:
 
 
     def procEvent(self, behav_event_proc_handle):
-        self.__robot_speaking_fsm.procEvent(behav_event_proc_handle.readSpeakEvent())
-        self.__robot_humming_fsm.procEvent(behav_event_proc_handle.readHumEvent())
+        self._robot_speaking_fsm.procEvent(behav_event_proc_handle.readSpeakEvent())
+        self._robot_humming_fsm.procEvent(behav_event_proc_handle.readHumEvent())
         self.__robot_nodding_fsm.procEvent(behav_event_proc_handle.readNodEvent())
         self.__robot_gaze_fsm.procEvent(behav_event_proc_handle.readGazeEvent())
 
     def getState(self):
         return {
                 'robot_speaking': {
-                    'val': self.__robot_speaking_fsm.current_state.id,
-                    'stamp': self.__robot_speaking_fsm.stamp_upon_entering,
-                    'transition': self.__robot_speaking_fsm.is_transition
+                    'val': self._robot_speaking_fsm.current_state.id,
+                    'stamp': self._robot_speaking_fsm.stamp_upon_entering,
+                    'transition': self._robot_speaking_fsm.is_transition
                     },
                 'robot_humming': {
-                    'val': self.__robot_humming_fsm.current_state.id,
-                    'stamp': self.__robot_humming_fsm.stamp_upon_entering,
-                    'transition': self.__robot_humming_fsm.is_transition
+                    'val': self._robot_humming_fsm.current_state.id,
+                    'stamp': self._robot_humming_fsm.stamp_upon_entering,
+                    'transition': self._robot_humming_fsm.is_transition
                     },
                 'robot_nodding': {
                     'val': self.__robot_nodding_fsm.current_state.id,
@@ -90,8 +90,8 @@ class RobotBehavFSM:
 
 
     def initializeState(self):
-        self.__robot_speaking_fsm.initializeState()
-        self.__robot_humming_fsm.initializeState()
+        self._robot_speaking_fsm.initializeState()
+        self._robot_humming_fsm.initializeState()
         self.__robot_nodding_fsm.initializeState()
         self.__robot_gaze_fsm.initializeState()
 
