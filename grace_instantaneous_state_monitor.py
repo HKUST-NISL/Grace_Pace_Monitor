@@ -167,7 +167,9 @@ class InstantaneousStateMonitor:
         #Update vad model (ugly)
         if( self.__robot_behav_fsm._robot_humming_fsm.current_state == robot_humming_fsm.RobotHummingFSM.humming
            or
-            self.__robot_behav_fsm._robot_speaking_fsm.current_state == robot_speaking_fsm.RobotSpeakingFSM.speaking):
+            self.__robot_behav_fsm._robot_speaking_fsm.current_state == robot_speaking_fsm.RobotSpeakingFSM.speaking
+           or
+            self.__turn_owner_fsm.current_state == turn_owner_fsm.TurnOwnerFSM.robot_turn):
             #Use less sensitive vad model
             self.__vad_model_pub.publish(std_msgs.msg.String(self.__config_data['Sensors']['PyannoteVAD']['ls_model_code']))
         else:
